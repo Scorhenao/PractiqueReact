@@ -1,9 +1,7 @@
 import React from 'react';
-import {View, Text} from 'react-native';
+import NavBar from './src/navigation/navBar';
 
-export const App = () => {
-  return <View>
-    <Text>Hola?</Text>
-  </View>;
+const App = () => {
+    return <NavBar />;
 };
 export default App;
