@@ -1,60 +1,89 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { Dropdown } from 'react-native-element-dropdown';
+import i18n from '../i18n'; // Importing the i18n configuration
+import colorsDarkMode from '../theme/colorsDarkMode';
+import colorsLightMode from '../theme/colorsWhiteMode';
 
 const NavBar = () => {
     const [showMenu, setShowMenu] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
-    const [language, setLanguage] = useState('ES');
-    const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+    const [language, setLanguage] = useState('US'); // Default to English ('US')
 
     const toggleMenu = () => setShowMenu(!showMenu);
     const toggleDarkMode = () => setDarkMode(!darkMode);
     const toggleSearch = () => setShowSearch(!showSearch);
 
+    // Theme colors based on darkMode state
+    const colors = darkMode ? colorsDarkMode : colorsLightMode;
+
+    // Change language function
+    const changeLanguage = (lang: string) => {
+        setLanguage(lang);
+        i18n.changeLanguage(lang === 'US' ? 'en' : 'es'); // Change i18n language
+    };
+
+    // Data for the dropdown
+    const data = [
+        { label: 'ES', value: 'ES' }, // Spanish
+        { label: 'US', value: 'US' }, // English
+    ];
+
     return (
-        <View style={styles.navbarContainer}>
+        <View style={[styles.navbarContainer, { backgroundColor: colors.navBackground }]}>
             {/* Dropdown Menu - Left */}
             <View style={styles.relative}>
                 <TouchableOpacity onPress={toggleMenu}>
-                    <FontAwesome name="bars" size={24} color="white" />
+                    <FontAwesome name="bars" size={24} color={colors.text} />
                 </TouchableOpacity>
                 {showMenu && (
-                    <View style={styles.menuContainer}>
+                    <View style={[styles.menuContainer, { backgroundColor: colors.secondaryBackground }]}>
                         {/* Dark Mode Toggle */}
                         <TouchableOpacity style={styles.menuItem} onPress={toggleDarkMode}>
-                            <FontAwesome name={darkMode ? 'sun-o' : 'moon-o'} size={20} color="white" />
-                            <Text style={styles.menuItemText}>
-                                {darkMode ? 'Light Mode' : 'Dark Mode'}
+                            <FontAwesome
+                                name={darkMode ? 'sun-o' : 'moon-o'}
+                                size={20}
+                                color={colors.text}
+                            />
+                            <Text style={[styles.menuItemText, { color: colors.text }]}>
+                                {darkMode ? i18n.t('lightMode') : i18n.t('darkMode')}
                             </Text>
                         </TouchableOpacity>
 
                         {/* Language Selector */}
-                        <TouchableOpacity style={styles.menuItem} onPress={() => setShowLanguageDropdown(!showLanguageDropdown)}>
-                            <Text style={styles.menuItemText}>{language}</Text>
-                        </TouchableOpacity>
-                        {showLanguageDropdown && (
-                            <View style={styles.dropdown}>
-                                <TouchableOpacity onPress={() => setLanguage('ES')}>
-                                    <Text style={styles.dropdownText}>ES</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => setLanguage('US')}>
-                                    <Text style={styles.dropdownText}>US</Text>
-                                </TouchableOpacity>
-                            </View>
-                        )}
+                        <Dropdown
+                            style={[styles.dropdown, { backgroundColor: colors.secondaryBackground }]}
+                            data={data}
+                            labelField="label"
+                            valueField="value"
+                            value={language}
+                            onChange={item => changeLanguage(item.value)}
+                            placeholder={i18n.t('selectLanguage')}
+                            placeholderStyle={[styles.placeholderStyle, { color: colors.text }]}
+                            selectedTextStyle={[styles.selectedTextStyle, { color: colors.text }]}
+                            containerStyle={[styles.dropdownContainerStyle, { backgroundColor: colors.secondaryBackground }]}
+                        />
 
                         {/* Help Button */}
                         <TouchableOpacity style={styles.menuItem}>
-                            <FontAwesome name="question-circle" size={20} color="white" />
-                            <Text style={styles.menuItemText}>Help</Text>
+                            <FontAwesome
+                                name="question-circle"
+                                size={20}
+                                color={colors.text}
+                            />
+                            <Text style={[styles.menuItemText, { color: colors.text }]}>
+                                {i18n.t('help')}
+                            </Text>
                         </TouchableOpacity>
 
                         {/* Settings Button */}
                         <TouchableOpacity style={styles.menuItem}>
-                            <FontAwesome name="cog" size={20} color="white" />
-                            <Text style={styles.menuItemText}>Settings</Text>
+                            <FontAwesome name="cog" size={20} color={colors.text} />
+                            <Text style={[styles.menuItemText, { color: colors.text }]}>
+                                {i18n.t('settings')}
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 )}
@@ -64,12 +93,13 @@ const NavBar = () => {
             <View style={styles.center}>
                 {showSearch ? (
                     <TextInput
-                        style={styles.searchInput}
-                        placeholder="Search..."
+                        style={[styles.searchInput, { backgroundColor: colors.text }]}
+                        placeholder={i18n.t('searchPlaceholder')}
+                        placeholderTextColor={colors.background}
                         autoFocus={true}
                     />
                 ) : (
-                    <Text style={styles.appTitle}>React Contacts</Text>
+                    <Text style={[styles.appTitle, { color: colors.text }]}>React Contacts</Text>
                 )}
             </View>
 
@@ -77,15 +107,17 @@ const NavBar = () => {
             <View style={styles.rightIcons}>
                 {/* Search Icon */}
                 <TouchableOpacity onPress={toggleSearch} style={styles.iconButton}>
-                    <FontAwesome name="search" size={24} color="white" />
+                    <FontAwesome name="search" size={24} color={colors.text} />
                 </TouchableOpacity>
 
                 {/* Profile Icon */}
                 <View style={styles.profileContainer}>
                     <TouchableOpacity>
-                        <FontAwesome name="user-circle" size={25} color="white" />
+                        <FontAwesome name="user-circle" size={25} color={colors.text} />
                     </TouchableOpacity>
-                    <Text style={styles.profileName}>John Doe</Text>
+                    <Text style={[styles.profileName, { color: colors.text }]}>
+                        {i18n.t('profileName')}
+                    </Text>
                 </View>
             </View>
         </View>
@@ -98,7 +130,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 16,
-        backgroundColor: '#2d2d2d', // Equivalent to bgGray800 in Tailwind
         height: 64,
         width: '100%',
     },
@@ -107,12 +138,11 @@ const styles = StyleSheet.create({
     },
     menuContainer: {
         position: 'absolute',
-        width: 100,
+        width: 150,
         top: 40,
         left: 0,
-        backgroundColor: '#3a3a3a', // Equivalent to bgGray700 in Tailwind
         padding: 16,
-        zIndex: 20, // zIndex to overlay menu
+        zIndex: 20,
         borderRadius: 8,
     },
     menuItem: {
@@ -121,30 +151,26 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     menuItemText: {
-        color: 'white',
         marginLeft: 8,
     },
     dropdown: {
-        marginTop: 8,
-        backgroundColor: '#4b4b4b', // Equivalent to bgGray600
-        padding: 8,
         borderRadius: 4,
+        paddingHorizontal: 8,
+        paddingVertical: 8,
+        marginBottom: 15,
     },
-    dropdownText: {
-        color: 'white',
-        paddingVertical: 4,
-    },
+    placeholderStyle: {},
+    selectedTextStyle: {},
+    dropdownContainerStyle: {},
     center: {
         alignItems: 'center',
     },
     searchInput: {
-        backgroundColor: 'white',
         padding: 8,
         borderRadius: 4,
         width: 256,
     },
     appTitle: {
-        color: 'white',
         fontSize: 20,
     },
     rightIcons: {
@@ -158,7 +184,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     profileName: {
-        color: 'white',
         textAlign: 'center',
     },
 });
