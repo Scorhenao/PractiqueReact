@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
         padding: 16,
         height: 64,
         width: '100%',
+        zIndex: 1,
     },
     relative: {
         position: 'relative',
@@ -142,8 +143,8 @@ const styles = StyleSheet.create({
         top: 40,
         left: 0,
         padding: 16,
-        zIndex: 20,
         borderRadius: 8,
+        zIndex:1,
     },
     menuItem: {
         flexDirection: 'row',
