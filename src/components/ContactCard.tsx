@@ -13,21 +13,23 @@ interface ContactCardProps {
     onDelete: (id: number) => void; // Prop para manejar la eliminación
 }
 
-const ContactCard: React.FC<ContactCardProps> = ({
-    contact, // Destructure contact from props
-    darkMode,
-    onDelete, // Destructure onDelete from props
-}) => {
+const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) => {
     const {phone, name, image, isEmployee, id} = contact; // Destructure the properties from the contact
 
     const [modalVisible, setModalVisible] = useState(false);
+    const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false); // Nuevo estado para el modal de confirmación
     const colors = darkMode ? colorsDarkMode : colorsLightMode;
 
     // Define the navigation type
-    const navigation = useNavigation<EditContactScreenNavigationProp>(); // Specify navigation type
+    const navigation = useNavigation<EditContactScreenNavigationProp>();
 
     const toggleModal = () => {
         setModalVisible(!modalVisible);
+    };
+
+    const handleDelete = () => {
+        onDelete(id);
+        setConfirmDeleteVisible(false); // Cierra el modal de confirmación
     };
 
     return (
@@ -52,7 +54,7 @@ const ContactCard: React.FC<ContactCardProps> = ({
                 </View>
             </TouchableOpacity>
 
-            {/* Modal */}
+            {/* Modal para editar */}
             <Modal
                 transparent={true}
                 visible={modalVisible}
@@ -79,16 +81,44 @@ const ContactCard: React.FC<ContactCardProps> = ({
                         <TouchableOpacity
                             style={styles.modalButton}
                             onPress={() => {
-                                onDelete(id); // Llama a la función de eliminación
-                                setModalVisible(false); // Cierra el modal
+                                setModalVisible(false);
+                                setConfirmDeleteVisible(true); // Abre el modal de confirmación
                             }}>
                             <FontAwesome name="trash" size={20} color="#FF0000" />
                             <Text style={[styles.modalButtonText]}>Delete</Text>
                         </TouchableOpacity>
-
                         <TouchableOpacity onPress={toggleModal} style={styles.modalClose}>
                             <Text style={{color: colors.link}}>Close</Text>
                         </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Modal de confirmación de eliminación */}
+            <Modal
+                transparent={true}
+                visible={confirmDeleteVisible}
+                animationType="fade"
+                onRequestClose={() => setConfirmDeleteVisible(false)}>
+                <View style={styles.modalContainer}>
+                    <View
+                        style={[
+                            styles.modalContent,
+                            {backgroundColor: colors.secondaryBackground},
+                        ]}>
+                        <Text style={[styles.confirmText, {color: colors.text}]}>
+                            Are you sure you want to delete this contact?
+                        </Text>
+                        <View style={styles.confirmButtonContainer}>
+                            <TouchableOpacity onPress={handleDelete} style={styles.confirmButton}>
+                                <Text style={{color: '#FF0000'}}>Yes</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => setConfirmDeleteVisible(false)}
+                                style={styles.confirmButton}>
+                                <Text style={{color: colors.link}}>No</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </Modal>
@@ -169,6 +199,18 @@ const styles = StyleSheet.create({
     },
     modalClose: {
         marginTop: 10,
+    },
+    confirmText: {
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    confirmButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    confirmButton: {
+        padding: 10,
     },
 });
 
