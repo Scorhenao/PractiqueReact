@@ -1,26 +1,28 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, Image, StyleSheet, Modal} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {useNavigation} from '@react-navigation/native';
 import colorsDarkMode from '../theme/colorsDarkMode';
 import colorsLightMode from '../theme/colorsWhiteMode';
+import {EditContactScreenNavigationProp} from '../screens/types/NavigationTypes';
+import IContact from './interfaces/contact.interface';
 
 interface ContactCardProps {
-    phoneNumber: string;
-    contactName: string;
-    contactImage: string;
-    isEmployee: boolean;
+    contact: IContact;
     darkMode: boolean;
 }
 
 const ContactCard: React.FC<ContactCardProps> = ({
-    phoneNumber,
-    contactName,
-    contactImage,
-    isEmployee,
+    contact, // Destructure contact from props
     darkMode,
 }) => {
+    const {phone, name, image, isEmployee} = contact; // Destructure the properties from the contact
+
     const [modalVisible, setModalVisible] = useState(false);
     const colors = darkMode ? colorsDarkMode : colorsLightMode;
+
+    // Define the navigation type
+    const navigation = useNavigation<EditContactScreenNavigationProp>(); // Specify navigation type
 
     const toggleModal = () => {
         setModalVisible(!modalVisible);
@@ -28,14 +30,14 @@ const ContactCard: React.FC<ContactCardProps> = ({
 
     return (
         <View style={[styles.container, {backgroundColor: colors.background}]}>
-            <Text style={[styles.phoneNumber, {color: colors.text}]}>{phoneNumber}</Text>
+            <Text style={[styles.phoneNumber, {color: colors.text}]}>{phone}</Text>
             <View style={[styles.separator, {backgroundColor: colors.secondaryBackground}]} />
             <TouchableOpacity style={styles.contactInfo} onLongPress={toggleModal}>
                 <View style={styles.imageContainer}>
-                    <Image source={{uri: contactImage}} style={styles.contactImage} />
+                    <Image source={{uri: image}} style={styles.contactImage} />
                 </View>
                 <View style={styles.textContainer}>
-                    <Text style={[styles.contactName, {color: colors.text}]}>{contactName}</Text>
+                    <Text style={[styles.contactName, {color: colors.text}]}>{name}</Text>
                     <View
                         style={[
                             styles.label,
@@ -60,13 +62,21 @@ const ContactCard: React.FC<ContactCardProps> = ({
                             styles.modalContent,
                             {backgroundColor: colors.secondaryBackground},
                         ]}>
-                        <TouchableOpacity style={styles.modalButton}>
+                        <TouchableOpacity
+                            style={styles.modalButton}
+                            onPress={() => {
+                                setModalVisible(false);
+                                navigation.navigate('EditContact', {
+                                    contact: {...contact}, // Pass the entire contact object
+                                });
+                            }}>
                             <FontAwesome name="pencil" size={20} color={colors.text} />
                             <Text style={[styles.modalButtonText, {color: colors.text}]}>Edit</Text>
                         </TouchableOpacity>
+
                         <TouchableOpacity style={styles.modalButton}>
                             <FontAwesome name="trash" size={20} color="#FF0000" />
-                            <Text style={[styles.modalButtonText, {color: '#FF0000'}]}>Delete</Text>
+                            <Text style={[styles.modalButtonText]}>Delete</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={toggleModal} style={styles.modalClose}>
                             <Text style={{color: colors.link}}>Close</Text>
@@ -147,6 +157,7 @@ const styles = StyleSheet.create({
     modalButtonText: {
         marginLeft: 10,
         fontSize: 16,
+        color: '#FF0000',
     },
     modalClose: {
         marginTop: 10,

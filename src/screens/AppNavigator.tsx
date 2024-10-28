@@ -2,6 +2,7 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import AppContainer from './AppContainer';
 import AddContact from '../components/AddContact'; // Importa la pantalla de agregar contactos
+import EditContact from '../components/EditContact';
 
 export type RootStackParamList = {
     AppContainer: undefined;
@@ -19,6 +20,7 @@ export default function AppNavigator() {
                 component={AppContainer}
             />
             <Stack.Screen name="AddContact" component={AddContact} />
+            <Stack.Screen name="EditContact" component={EditContact} />
         </Stack.Navigator>
     );
 }

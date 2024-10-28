@@ -1,4 +1,3 @@
-// AddContact.tsx
 import React, {useState} from 'react';
 import {View, TextInput, Button, Image, StyleSheet, Alert} from 'react-native';
 import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
@@ -7,11 +6,11 @@ import colorsDarkMode from '../theme/colorsDarkMode';
 import colorsLightMode from '../theme/colorsWhiteMode';
 import useContacts from './hooks/useContacts';
 import {useNavigation} from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../screens/AppNavigator';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../screens/AppNavigator';
+import IContact from './interfaces/contact.interface';
 
 type AddContactScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddContact'>;
-
 
 const AddContact = ({darkMode}: {darkMode: boolean}) => {
     const [name, setName] = useState('');
@@ -21,7 +20,7 @@ const AddContact = ({darkMode}: {darkMode: boolean}) => {
     const [contactType, setContactType] = useState<'Employee' | 'Client'>('Employee');
 
     const {addContact} = useContacts();
-    const navigation =  useNavigation<AddContactScreenNavigationProp>(); // Initialize useNavigation
+    const navigation = useNavigation<AddContactScreenNavigationProp>();
 
     const handleSave = () => {
         if (!name || !phone || !email) {
@@ -29,17 +28,27 @@ const AddContact = ({darkMode}: {darkMode: boolean}) => {
             return;
         }
 
-        const newContact = {name, phone, email, image, isEmployee: contactType === 'Employee'};
+        // Crea el nuevo contacto y genera el ID
+        const newContact: IContact = {
+            id: Date.now(), // Genera un ID único
+            name,
+            phone,
+            email,
+            image,
+            isEmployee: contactType === 'Employee',
+        };
+
+        // Llama a la función addContact con el nuevo contacto
         addContact(newContact);
 
         Alert.alert('Success', 'Contact added successfully!', [
             {
                 text: 'OK',
-                onPress: () => navigation.navigate('AppContainer'), // Navigate back to AppContainer
+                onPress: () => navigation.navigate('AppContainer'),
             },
         ]);
 
-        // Reset form fields
+        // Resetea los campos
         setName('');
         setPhone('');
         setEmail('');
@@ -55,7 +64,6 @@ const AddContact = ({darkMode}: {darkMode: boolean}) => {
         });
     };
 
-    // TODO:=> I need to put a permition modal SERVICIO EXTERNO EN LA NUBE CON CLOUDINARY
     const handleTakePicture = () => {
         launchCamera({mediaType: 'photo', maxWidth: 300, maxHeight: 300}, response => {
             if (response.assets && response.assets.length > 0) {
@@ -92,7 +100,7 @@ const AddContact = ({darkMode}: {darkMode: boolean}) => {
 
             <Picker
                 selectedValue={contactType}
-                style={{height: 50, width: '100%', backgroundColor: colors.link}}
+                style={[styles.picker, {backgroundColor: colors.link}]}
                 onValueChange={itemValue => setContactType(itemValue)}>
                 <Picker.Item label="Employee" value="Employee" />
                 <Picker.Item label="Client" value="Client" />
@@ -116,6 +124,12 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginBottom: 10,
         paddingHorizontal: 8,
+        borderRadius: 8,
+    },
+    picker: {
+        height: 50,
+        width: '100%',
+        marginBottom: 10,
     },
     image: {
         width: 100,

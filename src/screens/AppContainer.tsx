@@ -1,28 +1,33 @@
-import React from 'react';
+import React, {useState} from 'react';
 import NavBar from '../components/navBar';
 import ContactCard from '../components/ContactCard';
 import AddFloatingButton from '../components/AddFloatingButton';
-import {StyleSheet, View} from 'react-native';
+import {RefreshControl, ScrollView, StyleSheet, View} from 'react-native';
 import useContacts from '../components/hooks/useContacts';
 
 const AppContainer = () => {
-    const {contacts} = useContacts();
+    const {contacts, loadContacts} = useContacts();
+    const [refreshing, setRefreshing] = useState(false);
 
-    const defaultImageUrl = 'https://customstickers.com/cdn/shop/products/STKDC-071MortyFace2.jpg?v=1707353170';
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await loadContacts(); //load the updated list of contacts
+        setRefreshing(false);
+    };
 
     return (
         <View style={styles.container}>
             <NavBar />
-            {contacts.map((contact, index) => (
-                <ContactCard
-                    key={index}
-                    phoneNumber={contact.phone}
-                    contactName={contact.name}
-                    contactImage={contact.image || defaultImageUrl} // Agrega una URL de imagen por defecto si no hay imagen
-                    isEmployee={true} // Cambia esto según tu lógica para empleados y clientes
-                    darkMode={true} // Cambia según la lógica de tu aplicación
-                />
-            ))}
+            <ScrollView
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+                {contacts.map((contact, index) => (
+                    <ContactCard
+                        key={index}
+                        contact={contact} // Pass the contact object
+                        darkMode={true} // Dark or light mode
+                    />
+                ))}
+            </ScrollView>
             <AddFloatingButton />
         </View>
     );
