@@ -10,13 +10,15 @@ import IContact from './interfaces/contact.interface';
 interface ContactCardProps {
     contact: IContact;
     darkMode: boolean;
+    onDelete: (id: number) => void; // Prop para manejar la eliminación
 }
 
 const ContactCard: React.FC<ContactCardProps> = ({
     contact, // Destructure contact from props
     darkMode,
+    onDelete, // Destructure onDelete from props
 }) => {
-    const {phone, name, image, isEmployee} = contact; // Destructure the properties from the contact
+    const {phone, name, image, isEmployee, id} = contact; // Destructure the properties from the contact
 
     const [modalVisible, setModalVisible] = useState(false);
     const colors = darkMode ? colorsDarkMode : colorsLightMode;
@@ -74,10 +76,16 @@ const ContactCard: React.FC<ContactCardProps> = ({
                             <Text style={[styles.modalButtonText, {color: colors.text}]}>Edit</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.modalButton}>
+                        <TouchableOpacity
+                            style={styles.modalButton}
+                            onPress={() => {
+                                onDelete(id); // Llama a la función de eliminación
+                                setModalVisible(false); // Cierra el modal
+                            }}>
                             <FontAwesome name="trash" size={20} color="#FF0000" />
                             <Text style={[styles.modalButtonText]}>Delete</Text>
                         </TouchableOpacity>
+
                         <TouchableOpacity onPress={toggleModal} style={styles.modalClose}>
                             <Text style={{color: colors.link}}>Close</Text>
                         </TouchableOpacity>

@@ -44,6 +44,13 @@ const useContacts = () => {
         await storeContacts(updatedContacts);
     };
 
+    // Delete an existing contact and save to AsyncStorage
+    const deleteContact = async (contactId: number) => {
+        const updatedContacts = contacts.filter(contact => contact.id !== contactId);
+        setContacts(updatedContacts);
+        await storeContacts(updatedContacts);
+    };
+
     // Save cotacts in AsyncStorage, handling mistakes
     const storeContacts = async (contactsList: IContact[]) => {
         try {
@@ -57,7 +64,7 @@ const useContacts = () => {
         loadContacts();
     }, [loadContacts]);
 
-    return {contacts, addContact, updateContact, loadContacts};
+    return {contacts, addContact, updateContact, deleteContact, loadContacts};
 };
 
 export default useContacts;

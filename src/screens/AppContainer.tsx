@@ -6,7 +6,7 @@ import {RefreshControl, ScrollView, StyleSheet, View} from 'react-native';
 import useContacts from '../components/hooks/useContacts';
 
 const AppContainer = () => {
-    const {contacts, loadContacts} = useContacts();
+    const {contacts, loadContacts, deleteContact} = useContacts();
     const [refreshing, setRefreshing] = useState(false);
 
     const onRefresh = async () => {
@@ -25,6 +25,7 @@ const AppContainer = () => {
                         key={index}
                         contact={contact} // Pass the contact object
                         darkMode={true} // Dark or light mode
+                        onDelete={deleteContact}
                     />
                 ))}
             </ScrollView>
