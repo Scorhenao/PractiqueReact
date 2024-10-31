@@ -14,6 +14,13 @@ const resources = {
             selectLanguage: 'Select language',
             profileName: 'John Doe',
             searchPlaceholder: 'Search...',
+            namePlaceholder: 'Name',
+            phonePlaceholder: 'Phone',
+            emailPlaceholder: 'Email',
+            employee: 'Employee',
+            client: 'Client',
+            errorMessage: 'Please fill all fields before saving.',
+            successMessage: 'Contact added successfully!',
         },
     },
     es: {
@@ -26,6 +33,13 @@ const resources = {
             selectLanguage: 'Selecciona idioma',
             profileName: 'Juan Pérez',
             searchPlaceholder: 'Buscar...',
+            namePlaceholder: 'Nombre',
+            phonePlaceholder: 'Teléfono',
+            emailPlaceholder: 'Correo Electrónico',
+            employee: 'Empleado',
+            client: 'Cliente',
+            errorMessage: 'Por favor, complete todos los campos antes de guardar.',
+            successMessage: '¡Contacto agregado exitosamente!',
         },
     },
 };
@@ -35,9 +49,8 @@ i18n.use(initReactI18next).init({
     lng: 'en', // Default language
     fallbackLng: 'en',
     interpolation: {
-        escapeValue: false, // React already escapes by default
+        escapeValue: false,
     },
-    // Store the selected language in AsyncStorage
     backend: {
         loadPath: () => AsyncStorage.getItem('language'),
         savePath: (language: string) => AsyncStorage.setItem('language', language),

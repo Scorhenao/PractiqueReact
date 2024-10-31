@@ -1,115 +1,135 @@
 import React, {useState} from 'react';
-import {View, TextInput, Button, Image, StyleSheet, Alert} from 'react-native';
-import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
+import {View, TextInput, TouchableOpacity, Image, StyleSheet, Alert, Text} from 'react-native';
+import {launchImageLibrary, launchCamera, ImagePickerResponse} from 'react-native-image-picker';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {Picker} from '@react-native-picker/picker';
-import colorsDarkMode from '../theme/colorsDarkMode';
-import colorsLightMode from '../theme/colorsWhiteMode';
+import colorsDarkMode from '../theme/colorsLightMode';
+import colorsLightMode from '../theme/colorsDarkMode';
 import useContacts from './hooks/useContacts';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from '../screens/AppNavigator';
+import {useTheme} from '../theme/themeContext';
+import {useTranslation} from 'react-i18next';
 import IContact from './interfaces/contact.interface';
+import {RootStackParamList} from '../screens/types/NavigationTypes';
 
-type AddContactScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddContact'>;
-
-const AddContact = ({darkMode}: {darkMode: boolean}) => {
+const AddContact = () => {
+    const {t} = useTranslation();
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
-    const [image, setImage] = useState<string | null>(null);
-    const [contactType, setContactType] = useState<'Employee' | 'Client'>('Employee');
+    const [contactType, setContactType] = useState('Client');
+    const [imageUri, setImageUri] = useState('');
 
     const {addContact} = useContacts();
-    const navigation = useNavigation<AddContactScreenNavigationProp>();
+    const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+    const {darkMode} = useTheme();
+    const colors = darkMode ? colorsDarkMode : colorsLightMode;
+
+    const handleImagePick = async (source: 'camera' | 'gallery') => {
+        const options = {
+            mediaType: 'photo' as const,
+            includeBase64: true,
+        };
+
+        let result: ImagePickerResponse;
+
+        if (source === 'camera') {
+            result = await launchCamera(options);
+        } else {
+            result = await launchImageLibrary(options);
+        }
+
+        if (result.assets && result.assets.length > 0) {
+            const uri = result.assets[0].uri; // Ensure uri is defined
+            if (uri) {
+                setImageUri(uri);
+            } else {
+                Alert.alert('Error', 'Failed to get image URI');
+            }
+        } else {
+            Alert.alert('Error', 'Failed to pick an image');
+        }
+    };
 
     const handleSave = () => {
-        if (!name || !phone || !email) {
-            Alert.alert('Error', 'Please fill all fields before saving.');
+        if (!name || !phone) {
+            Alert.alert(t('errorMessage'), t('fillRequiredFields'));
             return;
         }
 
-        // Crea el nuevo contacto y genera el ID
+        const currentContacts = []; // Replace this with your actual contacts array
+
         const newContact: IContact = {
-            id: Date.now(), // Genera un ID único
+            id: currentContacts.length + 1, // Simple incremental ID
             name,
             phone,
             email,
-            image,
+            image: imageUri,
             isEmployee: contactType === 'Employee',
         };
 
-        // Llama a la función addContact con el nuevo contacto
         addContact(newContact);
-
-        Alert.alert('Success', 'Contact added successfully!', [
-            {
-                text: 'OK',
-                onPress: () => navigation.navigate('AppContainer'),
-            },
-        ]);
-
-        // Resetea los campos
-        setName('');
-        setPhone('');
-        setEmail('');
-        setImage(null);
-        setContactType('Employee');
+        Alert.alert(t('successMessage')); // Show success message
+        navigation.goBack();
     };
-
-    const handleChooseImage = () => {
-        launchImageLibrary({mediaType: 'photo', maxWidth: 300, maxHeight: 300}, response => {
-            if (response.assets && response.assets.length > 0) {
-                setImage(response.assets[0].uri || null);
-            }
-        });
-    };
-
-    const handleTakePicture = () => {
-        launchCamera({mediaType: 'photo', maxWidth: 300, maxHeight: 300}, response => {
-            if (response.assets && response.assets.length > 0) {
-                setImage(response.assets[0].uri || null);
-            }
-        });
-    };
-
-    const colors = darkMode ? colorsDarkMode : colorsLightMode;
 
     return (
         <View style={[styles.container, {backgroundColor: colors.background}]}>
             <TextInput
-                placeholder="Name"
-                value={name}
+                placeholder={t('namePlaceholder')}
+                placeholderTextColor={colors.placeholder}
+                style={[
+                    styles.input,
+                    {backgroundColor: colors.inputBackground, color: colors.text},
+                ]}
                 onChangeText={setName}
-                style={[styles.input, {borderColor: colors.text, color: colors.text}]}
-                placeholderTextColor={colors.text}
             />
             <TextInput
-                placeholder="Phone"
-                value={phone}
+                placeholder={t('phonePlaceholder')}
+                placeholderTextColor={colors.placeholder}
+                style={[
+                    styles.input,
+                    {backgroundColor: colors.inputBackground, color: colors.text},
+                ]}
                 onChangeText={setPhone}
-                style={[styles.input, {borderColor: colors.text, color: colors.text}]}
-                placeholderTextColor={colors.text}
             />
             <TextInput
-                placeholder="Email"
-                value={email}
+                placeholder={t('emailPlaceholder')}
+                placeholderTextColor={colors.placeholder}
+                style={[
+                    styles.input,
+                    {backgroundColor: colors.inputBackground, color: colors.text},
+                ]}
                 onChangeText={setEmail}
-                style={[styles.input, {borderColor: colors.text, color: colors.text}]}
-                placeholderTextColor={colors.text}
             />
-
             <Picker
                 selectedValue={contactType}
-                style={[styles.picker, {backgroundColor: colors.link}]}
+                style={{color: colors.text, backgroundColor: colors.inputBackground}}
                 onValueChange={itemValue => setContactType(itemValue)}>
-                <Picker.Item label="Employee" value="Employee" />
-                <Picker.Item label="Client" value="Client" />
+                <Picker.Item label={t('client')} value="Client" />
+                <Picker.Item label={t('employee')} value="Employee" />
             </Picker>
-
-            {image && <Image source={{uri: image}} style={styles.image} />}
-            <Button title="Choose Image" onPress={handleChooseImage} color={colors.primary} />
-            <Button title="Take Picture" onPress={handleTakePicture} color={colors.primary} />
-            <Button title="Save Contact" onPress={handleSave} color={colors.primary} />
+            {!imageUri && <Text style={styles.noImageSelected}>{t('noImageSelected')}</Text>}
+            {imageUri ? <Image source={{uri: imageUri}} style={styles.image} /> : null}
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity onPress={() => handleImagePick('gallery')} style={styles.button}>
+                    <FontAwesome name="photo" size={20} color={colors.text} />
+                    <Text style={[styles.buttonText, {color: colors.text}]}>
+                        {t('chooseImage')}
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleImagePick('camera')} style={styles.button}>
+                    <FontAwesome name="camera" size={20} color={colors.text} />
+                    <Text style={[styles.buttonText, {color: colors.text}]}>
+                        {t('takePicture')}
+                    </Text>
+                </TouchableOpacity>
+            </View>
+            <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
+                <FontAwesome name="save" size={20} color="#fff" />
+                <Text style={styles.saveButtonText}>{t('save')}</Text>
+            </TouchableOpacity>
         </View>
     );
 };
@@ -122,20 +142,51 @@ const styles = StyleSheet.create({
     input: {
         height: 40,
         borderWidth: 1,
-        marginBottom: 10,
-        paddingHorizontal: 8,
-        borderRadius: 8,
-    },
-    picker: {
-        height: 50,
-        width: '100%',
-        marginBottom: 10,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        marginBottom: 20,
+        paddingHorizontal: 10,
     },
     image: {
         width: 100,
         height: 100,
+        borderRadius: 10,
         marginBottom: 20,
-        borderRadius: 8,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+    },
+    button: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#ccc',
+    },
+    buttonText: {
+        marginLeft: 10,
+    },
+    saveButton: {
+        backgroundColor: '#007BFF',
+        padding: 15,
+        borderRadius: 5,
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    saveButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        marginLeft: 5, // Add some space between icon and text
+    },
+    noImageSelected: {
+        color: '#FFCCCB', // Light red color
+        marginTop: 6,
+        marginBottom: 6,
+        textAlign: 'center', // Center the text
     },
 });
 

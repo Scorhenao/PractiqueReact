@@ -2,25 +2,26 @@ import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, Image, StyleSheet, Modal} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {useNavigation} from '@react-navigation/native';
-import colorsDarkMode from '../theme/colorsDarkMode';
-import colorsLightMode from '../theme/colorsWhiteMode';
+import colorsDarkMode from '../theme/colorsLightMode';
+import colorsLightMode from '../theme/colorsDarkMode';
 import {EditContactScreenNavigationProp} from '../screens/types/NavigationTypes';
 import IContact from './interfaces/contact.interface';
+import i18n from '../i18n';
 
 interface ContactCardProps {
     contact: IContact;
     darkMode: boolean;
-    onDelete: (id: number) => void; // Prop para manejar la eliminación
+    onDelete: (id: number) => void;
 }
 
 const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) => {
-    const {phone, name, image, isEmployee, id} = contact; // Destructure the properties from the contact
+    const {phone, name, image, isEmployee, id} = contact;
 
     const [modalVisible, setModalVisible] = useState(false);
-    const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false); // Nuevo estado para el modal de confirmación
+    const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
+    const [hover, setHover] = useState(false); // State for hover effect
     const colors = darkMode ? colorsDarkMode : colorsLightMode;
 
-    // Define the navigation type
     const navigation = useNavigation<EditContactScreenNavigationProp>();
 
     const toggleModal = () => {
@@ -29,19 +30,18 @@ const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) 
 
     const handleDelete = () => {
         onDelete(id);
-        setConfirmDeleteVisible(false); // Cierra el modal de confirmación
+        setConfirmDeleteVisible(false);
     };
 
     return (
         <View style={[styles.container, {backgroundColor: colors.background}]}>
-            <Text style={[styles.phoneNumber, {color: colors.text}]}>{phone}</Text>
-            <View style={[styles.separator, {backgroundColor: colors.secondaryBackground}]} />
             <TouchableOpacity style={styles.contactInfo} onLongPress={toggleModal}>
                 <View style={styles.imageContainer}>
                     <Image source={{uri: image}} style={styles.contactImage} />
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={[styles.contactName, {color: colors.text}]}>{name}</Text>
+                    <Text style={[styles.phoneNumber, {color: colors.text}]}>{phone}</Text>
                     <View
                         style={[
                             styles.label,
@@ -49,12 +49,24 @@ const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) 
                                 ? {backgroundColor: colors.primary}
                                 : {backgroundColor: colors.link},
                         ]}>
-                        <Text style={styles.labelText}>{isEmployee ? 'Employee' : 'Client'}</Text>
+                        <Text style={styles.labelText}>
+                            {isEmployee ? i18n.t('employee') : i18n.t('client')}
+                        </Text>
                     </View>
                 </View>
             </TouchableOpacity>
 
-            {/* Modal para editar */}
+            {/* Icon with three dots */}
+            <TouchableOpacity
+                style={[styles.dotsIconContainer, hover && styles.hoverEffect]} // Apply hover effect
+                onPress={toggleModal}
+                onPressIn={() => setHover(true)} // Set hover to true on press
+                onPressOut={() => setHover(false)} // Set hover to false on release
+            >
+                <FontAwesome name="ellipsis-v" size={20} color={colors.text} />
+            </TouchableOpacity>
+
+            {/* Modal for editing */}
             <Modal
                 transparent={true}
                 visible={modalVisible}
@@ -71,7 +83,7 @@ const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) 
                             onPress={() => {
                                 setModalVisible(false);
                                 navigation.navigate('EditContact', {
-                                    contact: {...contact}, // Pass the entire contact object
+                                    contact: {...contact},
                                 });
                             }}>
                             <FontAwesome name="pencil" size={20} color={colors.text} />
@@ -82,7 +94,7 @@ const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) 
                             style={styles.modalButton}
                             onPress={() => {
                                 setModalVisible(false);
-                                setConfirmDeleteVisible(true); // Abre el modal de confirmación
+                                setConfirmDeleteVisible(true);
                             }}>
                             <FontAwesome name="trash" size={20} color="#FF0000" />
                             <Text style={[styles.modalButtonText]}>Delete</Text>
@@ -135,18 +147,14 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
     },
     phoneNumber: {
-        fontSize: 16,
-        flex: 1,
-    },
-    separator: {
-        width: 1,
-        height: '100%',
-        marginHorizontal: 10,
+        fontSize: 14,
+        marginTop: 4,
     },
     contactInfo: {
         flexDirection: 'row',
         alignItems: 'center',
         flex: 3,
+        paddingRight: 10, // Adjusted to make space for the icon
     },
     imageContainer: {
         position: 'relative',
@@ -159,20 +167,23 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         flex: 1,
+        justifyContent: 'center',
     },
     contactName: {
         fontSize: 16,
         fontWeight: 'bold',
     },
     label: {
-        marginTop: 5,
-        paddingHorizontal: 10,
-        paddingVertical: 4,
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
         borderRadius: 4,
     },
     labelText: {
         color: '#fff',
-        fontSize: 12,
+        fontSize: 10,
         textAlign: 'center',
     },
     modalContainer: {
@@ -211,6 +222,17 @@ const styles = StyleSheet.create({
     },
     confirmButton: {
         padding: 10,
+    },
+    dotsIconContainer: {
+        position: 'absolute',
+        right: 10, // Positioning the dots icon to the right
+        top: 16, // Adjust vertical position as needed
+        marginRight: 16,
+    },
+    hoverEffect: {
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.8)', // Change color as needed
+        borderRadius: 50,
     },
 });
 

@@ -1,13 +1,16 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import AppNavigator from './src/screens/AppNavigator';
+import { ThemeProvider } from './src/theme/themeContext';
 
 
 const App = () => {
     return (
-        <NavigationContainer>
-            <AppNavigator/>
-        </NavigationContainer>
+        <ThemeProvider>
+            <NavigationContainer>
+                <AppNavigator/>
+            </NavigationContainer>
+        </ThemeProvider>
 
     );
 };

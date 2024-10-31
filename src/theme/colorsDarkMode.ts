@@ -1,5 +1,5 @@
-// Define an interface for the light mode color palette
-interface IColorsLight {
+// You can do the same for dark mode colors if needed
+interface IColorsDark {
     primary: string;
     background: string;
     text: string;
@@ -7,17 +7,20 @@ interface IColorsLight {
     link: string;
     hover: string;
     navBackground: string;
+    placeholder: string; // Add placeholder color
+    inputBackground: string; // Add input background color
 }
 
-// Define the light mode colors
-const colorsLightMode: IColorsLight = {
-    primary: '#007BFF', // Main color for buttons, highlights, and interactive elements.
-    background: '#FFFFFF', // Main background color of the app (light background).
-    text: '#101422', // Text color for main text and titles (dark text for readability).
-    secondaryBackground: '#F0F0F0', // Light background for secondary sections or cards.
-    link: '#007BFF', // Blue color for links and secondary buttons.
-    hover: '#0056b3', // Darker blue for hover and active state.
-    navBackground: '#F8F9FA', // Lighter color for navigation bar or headers.
+// Define the dark mode colors
+const colorsDarkMode: IColorsDark = {
+    primary: '#A8DCE7', // Main color for buttons, highlights, and interactive elements.
+    background: '#101422', // Main background color of the app.
+    text: '#FFFFFF', // Text color for main text and titles.
+    secondaryBackground: '#272B3B', // Background color for secondary sections or cards.
+    link: '#A8DCE7', // Color for links or secondary buttons.
+    hover: '#A8DCE7', // Color for hover or active state.
+    navBackground: '#272B3B', // Background color for the navigation bar or headers.
+    placeholder: '#FFFFFF', // Define the color for placeholders
+    inputBackground: '#272B3B', // Define background for inputs
 };
-
-export default colorsLightMode;
+export default colorsDarkMode;

@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Modal} from 'react-native';
-import colorsDarkMode from '../theme/colorsDarkMode';
-import colorsLightMode from '../theme/colorsWhiteMode';
+import colorsDarkMode from '../theme/colorsLightMode';
+import colorsLightMode from '../theme/colorsDarkMode';
 
 interface DeleteContactModalProps {
     visible: boolean;

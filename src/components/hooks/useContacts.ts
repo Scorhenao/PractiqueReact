@@ -1,9 +1,11 @@
 import {useState, useEffect, useCallback} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IContact from '../interfaces/contact.interface';
+import { useIsFocused } from '@react-navigation/native';
 
 const useContacts = () => {
     const [contacts, setContacts] = useState<IContact[]>([]);
+    const focused = useIsFocused();
 
     // take contacts saved in AsyncStorage
     const loadContacts = useCallback(async () => {
@@ -62,7 +64,7 @@ const useContacts = () => {
     // charge contact from the component
     useEffect(() => {
         loadContacts();
-    }, [loadContacts]);
+    }, [loadContacts, focused]);
 
     return {contacts, addContact, updateContact, deleteContact, loadContacts};
 };
