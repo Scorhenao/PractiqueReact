@@ -1,18 +1,25 @@
 import React from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {useNavigation} from '@react-navigation/native'; // Para navegación
+import {useNavigation} from '@react-navigation/native';
 
-const AddFloatingButton = () => {
+// Definimos una interfaz para las propiedades
+interface AddFloatingButtonProps {
+    buttonColor: string; // Especificamos que buttonColor es de tipo string
+}
+
+const AddFloatingButton: React.FC<AddFloatingButtonProps> = ({buttonColor}) => {
     const navigation = useNavigation();
 
     const handleAddContact = () => {
-        navigation.navigate('AddContact'); //'AddContact' screen where you add contacts
+        navigation.navigate('AddContact');
     };
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.button} onPress={handleAddContact}>
+            <TouchableOpacity
+                style={[styles.button, {backgroundColor: buttonColor}]}
+                onPress={handleAddContact}>
                 <FontAwesome name="plus" size={24} color="#fff" />
             </TouchableOpacity>
         </View>
@@ -27,14 +34,13 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     button: {
-        backgroundColor: '#4CAF50',
         width: 60,
         height: 60,
         borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 5, // shadow in Android
-        shadowColor: '#000', // shadow in iOS
+        elevation: 5,
+        shadowColor: '#000',
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.3,
         shadowRadius: 3.84,

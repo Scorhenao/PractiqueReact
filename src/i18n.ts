@@ -21,6 +21,11 @@ const resources = {
             client: 'Client',
             errorMessage: 'Please fill all fields before saving.',
             successMessage: 'Contact added successfully!',
+            viewMore: 'View More',
+            edit: 'Edit',
+            delete: 'Delete',
+            close: 'Close',
+            role: 'Role',
         },
     },
     es: {
@@ -40,6 +45,11 @@ const resources = {
             client: 'Cliente',
             errorMessage: 'Por favor, complete todos los campos antes de guardar.',
             successMessage: '¡Contacto agregado exitosamente!',
+            viewMore: 'Ver Más',
+            edit: 'Editar',
+            delete: 'Eliminar',
+            close: 'Cerrar',
+            role: 'Rol',
         },
     },
 };

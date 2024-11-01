@@ -40,8 +40,8 @@ const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) 
                     <Image source={{uri: image}} style={styles.contactImage} />
                 </View>
                 <View style={styles.textContainer}>
-                    <Text style={[styles.contactName, {color: colors.text}]}>{name}</Text>
-                    <Text style={[styles.phoneNumber, {color: colors.text}]}>{phone}</Text>
+                    <Text style={[styles.contactName, {color: colors.textContacts}]}>{name}</Text>
+                    <Text style={[styles.phoneNumber, {color: colors.textContacts}]}>{phone}</Text>
                     <View
                         style={[
                             styles.label,
@@ -56,17 +56,11 @@ const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) 
                 </View>
             </TouchableOpacity>
 
-            {/* Icon with three dots */}
-            <TouchableOpacity
-                style={[styles.dotsIconContainer, hover && styles.hoverEffect]} // Apply hover effect
-                onPress={toggleModal}
-                onPressIn={() => setHover(true)} // Set hover to true on press
-                onPressOut={() => setHover(false)} // Set hover to false on release
-            >
-                <FontAwesome name="ellipsis-v" size={20} color={colors.text} />
+            <TouchableOpacity style={styles.dotsIconContainer} onPress={toggleModal}>
+                <FontAwesome name="ellipsis-v" size={20} color={colors.textContacts} />
             </TouchableOpacity>
 
-            {/* Modal for editing */}
+            {/* Modal for options */}
             <Modal
                 transparent={true}
                 visible={modalVisible}
@@ -82,12 +76,24 @@ const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) 
                             style={styles.modalButton}
                             onPress={() => {
                                 setModalVisible(false);
-                                navigation.navigate('EditContact', {
-                                    contact: {...contact},
-                                });
+                                navigation.navigate('EditContact', {contact});
                             }}>
                             <FontAwesome name="pencil" size={20} color={colors.text} />
-                            <Text style={[styles.modalButtonText, {color: colors.text}]}>Edit</Text>
+                            <Text style={[styles.modalButtonText, {color: colors.text}]}>
+                                {i18n.t('edit')}
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.modalButton}
+                            onPress={() => {
+                                setModalVisible(false);
+                                navigation.navigate('ViewContact', {contact});
+                            }}>
+                            <FontAwesome name="eye" size={20} color={colors.text} />
+                            <Text style={[styles.modalButtonText, {color: colors.text}]}>
+                                {i18n.t('viewMore')}
+                            </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -97,10 +103,11 @@ const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) 
                                 setConfirmDeleteVisible(true);
                             }}>
                             <FontAwesome name="trash" size={20} color="#FF0000" />
-                            <Text style={[styles.modalButtonText]}>Delete</Text>
+                            <Text style={[styles.modalButtonText]}>{i18n.t('delete')}</Text>
                         </TouchableOpacity>
+
                         <TouchableOpacity onPress={toggleModal} style={styles.modalClose}>
-                            <Text style={{color: colors.link}}>Close</Text>
+                            <Text style={{color: colors.link}}>{i18n.t('close')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

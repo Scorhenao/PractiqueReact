@@ -54,7 +54,7 @@ const AddContact = () => {
 
     const handleSave = () => {
         if (!name || !phone) {
-            Alert.alert(t('errorMessage'), t('fillRequiredFields'));
+            Alert.alert(t('errorMessage'), t('fill Required Fields'));
             return;
         }
 
@@ -76,6 +76,13 @@ const AddContact = () => {
 
     return (
         <View style={[styles.container, {backgroundColor: colors.background}]}>
+            <View style={styles.imageContainer}>
+                {imageUri ? (
+                    <Image source={{uri: imageUri}} style={styles.image} />
+                ) : (
+                    <Text style={styles.noImageSelected}>{t('no Image Selected')}</Text>
+                )}
+            </View>
             <TextInput
                 placeholder={t('namePlaceholder')}
                 placeholderTextColor={colors.placeholder}
@@ -110,8 +117,6 @@ const AddContact = () => {
                 <Picker.Item label={t('client')} value="Client" />
                 <Picker.Item label={t('employee')} value="Employee" />
             </Picker>
-            {!imageUri && <Text style={styles.noImageSelected}>{t('noImageSelected')}</Text>}
-            {imageUri ? <Image source={{uri: imageUri}} style={styles.image} /> : null}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity onPress={() => handleImagePick('gallery')} style={styles.button}>
                     <FontAwesome name="photo" size={20} color={colors.text} />
@@ -147,11 +152,16 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         paddingHorizontal: 10,
     },
-    image: {
-        width: 100,
-        height: 100,
-        borderRadius: 10,
+    imageContainer: {
+        alignItems: 'center', // Center the content horizontally
+        justifyContent: 'center', // Center the content vertically
         marginBottom: 20,
+    },
+    image: {
+        marginTop: 20,
+        width: 150, // Increased size
+        height: 150, // Increased size
+        borderRadius: 100,
     },
     buttonContainer: {
         flexDirection: 'row',
@@ -164,7 +174,8 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: 'black',
+        marginTop: 20,
     },
     buttonText: {
         marginLeft: 10,
@@ -183,7 +194,7 @@ const styles = StyleSheet.create({
         marginLeft: 5, // Add some space between icon and text
     },
     noImageSelected: {
-        color: '#FFCCCB', // Light red color
+        color: '#fc0804', // Light red color
         marginTop: 6,
         marginBottom: 6,
         textAlign: 'center', // Center the text
