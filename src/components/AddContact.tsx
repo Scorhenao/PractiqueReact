@@ -12,6 +12,7 @@ import {useTheme} from '../theme/themeContext';
 import {useTranslation} from 'react-i18next';
 import IContact from './interfaces/contact.interface';
 import {RootStackParamList} from '../screens/types/NavigationTypes';
+import Config from '../../config'; // Import the Config
 
 const AddContact = () => {
     const {t} = useTranslation();
@@ -20,6 +21,7 @@ const AddContact = () => {
     const [email, setEmail] = useState('');
     const [contactType, setContactType] = useState('Client');
     const [imageUri, setImageUri] = useState('');
+    const [location, setLocation] = useState<{latitude: number; longitude: number} | null>(null);
 
     const {addContact} = useContacts();
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -41,7 +43,7 @@ const AddContact = () => {
         }
 
         if (result.assets && result.assets.length > 0) {
-            const uri = result.assets[0].uri; // Ensure uri is defined
+            const uri = result.assets[0].uri;
             if (uri) {
                 setImageUri(uri);
             } else {
@@ -67,12 +69,24 @@ const AddContact = () => {
             email,
             image: imageUri,
             isEmployee: contactType === 'Employee',
+            location: location,
         };
 
         addContact(newContact);
-        Alert.alert(t('successMessage')); // Show success message
+        Alert.alert(t('successMessage'));
         navigation.goBack();
     };
+
+    const handleLocationSelect = () => {
+        navigation.navigate('SelectLocation', {
+            onLocationSelected: (loc: {latitude: number; longitude: number}) => {
+                setLocation(loc);
+            },
+        });
+    };
+
+    // Example usage of the API Key (if needed for functionality)
+    console.log('Using API Key:', Config.apiKey);
 
     return (
         <View style={[styles.container, {backgroundColor: colors.background}]}>
@@ -117,6 +131,10 @@ const AddContact = () => {
                 <Picker.Item label={t('client')} value="Client" />
                 <Picker.Item label={t('employee')} value="Employee" />
             </Picker>
+            <TouchableOpacity onPress={handleLocationSelect} style={styles.button}>
+                <FontAwesome name="map-marker" size={20} color={colors.text} />
+                <Text style={[styles.buttonText, {color: colors.text}]}>{t('selectLocation')}</Text>
+            </TouchableOpacity>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity onPress={() => handleImagePick('gallery')} style={styles.button}>
                     <FontAwesome name="photo" size={20} color={colors.text} />
@@ -153,14 +171,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     imageContainer: {
-        alignItems: 'center', // Center the content horizontally
-        justifyContent: 'center', // Center the content vertically
+        alignItems: 'center',
+        justifyContent: 'center',
         marginBottom: 20,
     },
     image: {
         marginTop: 20,
-        width: 150, // Increased size
-        height: 150, // Increased size
+        width: 150,
+        height: 150,
         borderRadius: 100,
     },
     buttonContainer: {
@@ -191,13 +209,13 @@ const styles = StyleSheet.create({
     saveButtonText: {
         color: '#fff',
         fontSize: 16,
-        marginLeft: 5, // Add some space between icon and text
+        marginLeft: 5,
     },
     noImageSelected: {
-        color: '#fc0804', // Light red color
+        color: '#fc0804',
         marginTop: 6,
         marginBottom: 6,
-        textAlign: 'center', // Center the text
+        textAlign: 'center',
     },
 });
 

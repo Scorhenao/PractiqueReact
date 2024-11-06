@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     },
     labelText: {
         color: '#fff',
-        fontSize: 10,
+        fontSize: 12,
         textAlign: 'center',
     },
     modalContainer: {

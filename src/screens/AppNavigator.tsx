@@ -5,6 +5,7 @@ import AddContact from '../components/AddContact';
 import EditContact from '../components/EditContact';
 import ViewContact from '../components/ViewContact';
 import IContact from '../components/interfaces/contact.interface';
+import SelectLocation from '../components/SelectLocation';
 
 export type RootStackParamList = {
     AppContainer: undefined;
@@ -26,6 +27,7 @@ export default function AppNavigator() {
             <Stack.Screen name="AddContact" component={AddContact} />
             <Stack.Screen name="EditContact" component={EditContact} />
             <Stack.Screen name="ViewContact" component={ViewContact} />
+            <Stack.Screen name="SelectLocation" component={SelectLocation} />
         </Stack.Navigator>
     );
 }
