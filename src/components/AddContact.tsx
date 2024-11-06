@@ -56,7 +56,7 @@ const AddContact = () => {
 
     const handleSave = () => {
         if (!name || !phone) {
-            Alert.alert(t('errorMessage'), t('fill Required Fields'));
+            Alert.alert(t('errorMessage'), t('fillRequiredFields'));
             return;
         }
 
@@ -69,7 +69,7 @@ const AddContact = () => {
             email,
             image: imageUri,
             isEmployee: contactType === 'Employee',
-            location: location,
+            location: location, // Ensure correct location is saved
         };
 
         addContact(newContact);
@@ -80,7 +80,7 @@ const AddContact = () => {
     const handleLocationSelect = () => {
         navigation.navigate('SelectLocation', {
             onLocationSelected: (loc: {latitude: number; longitude: number}) => {
-                setLocation(loc);
+                setLocation(loc); // Ensure location is passed and set correctly
             },
         });
     };
@@ -94,7 +94,7 @@ const AddContact = () => {
                 {imageUri ? (
                     <Image source={{uri: imageUri}} style={styles.image} />
                 ) : (
-                    <Text style={styles.noImageSelected}>{t('no Image Selected')}</Text>
+                    <Text style={styles.noImageSelected}>{t('noImageSelected')}</Text>
                 )}
             </View>
             <TextInput

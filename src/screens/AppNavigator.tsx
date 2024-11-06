@@ -12,6 +12,7 @@ export type RootStackParamList = {
     AddContact: undefined;
     EditContact: {contact: IContact};
     ViewContact: {contact: IContact};
+    SelectLocation: {onLocationSelected: (loc: {latitude: string; longitude: string}) => void}; // Agregar SelectLocation con sus parámetros
 };
 
 const Stack = createStackNavigator<RootStackParamList>();

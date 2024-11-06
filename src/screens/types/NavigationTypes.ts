@@ -1,10 +1,10 @@
-import { RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import {RouteProp} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
 import IContact from '../../components/interfaces/contact.interface';
 export type RootStackParamList = {
     Home: undefined; // No parameters for Home
-    EditContact: { contact: IContact }; // Parameters for EditContact
-    // Add other screens here as needed
+    EditContact: {contact: IContact}; // Parameters for EditContact
+    SelectLocation: {onLocationSelected: (loc: {latitude: number; longitude: number}) => void};
 };
 
 export type EditContactScreenNavigationProp = StackNavigationProp<
@@ -12,7 +12,4 @@ export type EditContactScreenNavigationProp = StackNavigationProp<
     'EditContact'
 >;
 
-export type EditContactScreenRouteProp = RouteProp<
-    RootStackParamList,
-    'EditContact'
->;
+export type EditContactScreenRouteProp = RouteProp<RootStackParamList, 'EditContact'>;

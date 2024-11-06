@@ -1,48 +1,36 @@
 import React, {useState} from 'react';
-import {View, Button, StyleSheet, Text} from 'react-native';
-import {RouteProp, NavigationProp} from '@react-navigation/native';
-import Config from '../../config'; // Import Config here
+import {View, Button, StyleSheet} from 'react-native';
+import MapView, {Marker} from 'react-native-maps';
 
-// Define the route prop type specifically for SelectLocation
-type SelectLocationRouteProp = RouteProp<
-    {
-        SelectLocation: {
-            onLocationSelected: (loc: {latitude: string; longitude: string}) => void;
-        };
-    },
-    'SelectLocation'
->;
+const SelectLocation: React.FC = ({navigation}) => {
+    const [location, setLocation] = useState<{latitude: number; longitude: number} | null>(null);
 
-// Define navigation prop type for Stack Navigator
-type SelectLocationNavigationProp = NavigationProp<any>;
-
-// Define the props expected by the SelectLocation component
-interface SelectLocationProps {
-    route: SelectLocationRouteProp;
-    navigation: SelectLocationNavigationProp;
-}
-
-const SelectLocation: React.FC<SelectLocationProps> = ({route, navigation}) => {
-    const {onLocationSelected} = route.params;
-    const [location, setLocation] = useState<{latitude: string; longitude: string} | null>(null);
-
-    const handleSelectLocation = (lat: string, long: string) => {
-        const loc = {latitude: lat, longitude: long};
-        setLocation(loc);
-        onLocationSelected(loc);
+    const handleSelectLocation = (lat: number, long: number) => {
+        const loc = {latitude: lat.toString(), longitude: long.toString()};
+        setLocation({latitude: lat, longitude: long});
         navigation.goBack();
     };
 
-    // Example usage of the API Key (if needed for functionality)
-    console.log('Using API Key in SelectLocation:', Config.apiKey);
-
     return (
         <View style={styles.container}>
-            {/* Add map or location selection logic here */}
-            <Text>Location Selector (Map or other)</Text>
+            <MapView
+                provider="google" // Aquí especificamos que queremos usar Google Maps
+                style={styles.map}
+                initialRegion={{
+                    latitude: 37.78825,
+                    longitude: -122.4324,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }}
+                onPress={e => {
+                    const {latitude, longitude} = e.nativeEvent.coordinate;
+                    handleSelectLocation(latitude, longitude);
+                }}>
+                {location && <Marker coordinate={location} title="Selected Location" />}
+            </MapView>
             <Button
                 title="Select Location"
-                onPress={() => handleSelectLocation('12.34', '56.78')}
+                onPress={() => handleSelectLocation(12.34, 56.78)} // Coordenadas de ejemplo
             />
         </View>
     );
@@ -53,6 +41,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    map: {
+        width: '100%',
+        height: '80%',
     },
 });
 
