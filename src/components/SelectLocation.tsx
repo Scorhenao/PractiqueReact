@@ -1,37 +1,63 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {View, Button, StyleSheet} from 'react-native';
-import MapView, {Marker} from 'react-native-maps';
+import MapView, {Marker, AnimatedRegion, PROVIDER_GOOGLE} from 'react-native-maps';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../screens/types/NavigationTypes';
+import {useLocation} from '../context/LocationContext';
 
-const SelectLocation: React.FC = ({navigation}) => {
-    const [location, setLocation] = useState<{latitude: number; longitude: number} | null>(null);
+type SelectLocationScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SelectLocation'>;
 
-    const handleSelectLocation = (lat: number, long: number) => {
-        const loc = {latitude: lat.toString(), longitude: long.toString()};
-        setLocation({latitude: lat, longitude: long});
-        navigation.goBack();
-    };
+type SelectLocationProps = {
+    navigation: SelectLocationScreenNavigationProp;
+};
+
+const SelectLocation: React.FC<SelectLocationProps> = ({navigation}) => {
+    const {location, getLocation} = useLocation();
+    const [region, setRegion] = useState<AnimatedRegion | null>(null);
+
+    useEffect(() => {
+        getLocation();
+    }, [getLocation]);
+
+    useEffect(() => {
+        if (location) {
+            setRegion(
+                new AnimatedRegion({
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }),
+            );
+        }
+    }, [location]);
+
+    const handleSelectLocation = useCallback(
+        (lat: number, long: number) => {
+            navigation.navigate('AddContact', {location: {latitude: lat, longitude: long}});
+        },
+        [navigation],
+    );
 
     return (
         <View style={styles.container}>
             <MapView
-                provider="google" // Aquí especificamos que queremos usar Google Maps
+                provider={PROVIDER_GOOGLE} // IMPORTANTE: usa PROVIDER_GOOGLE si estás usando Google Maps
                 style={styles.map}
-                initialRegion={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
+                region={region ? region.getLatLng() : undefined}
+                onRegionChangeComplete={newRegion => {
+                    if (region) {
+                        region.setValue(newRegion);
+                    }
                 }}
                 onPress={e => {
-                    const {latitude, longitude} = e.nativeEvent.coordinate;
-                    handleSelectLocation(latitude, longitude);
+                    const coordinate = e.nativeEvent.coordinate;
+                    handleSelectLocation(coordinate.latitude, coordinate.longitude);
                 }}>
-                {location && <Marker coordinate={location} title="Selected Location" />}
+                {location && <Marker coordinate={location} />}
             </MapView>
-            <Button
-                title="Select Location"
-                onPress={() => handleSelectLocation(12.34, 56.78)} // Coordenadas de ejemplo
-            />
+
+            <Button title="Select Location" onPress={() => handleSelectLocation(12.34, 56.78)} />
         </View>
     );
 };

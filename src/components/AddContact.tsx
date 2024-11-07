@@ -1,27 +1,32 @@
 import React, {useState} from 'react';
 import {View, TextInput, TouchableOpacity, Image, StyleSheet, Alert, Text} from 'react-native';
-import {launchImageLibrary, launchCamera, ImagePickerResponse} from 'react-native-image-picker';
+import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {Picker} from '@react-native-picker/picker';
 import colorsDarkMode from '../theme/colorsLightMode';
 import colorsLightMode from '../theme/colorsDarkMode';
 import useContacts from './hooks/useContacts';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useTheme} from '../theme/themeContext';
 import {useTranslation} from 'react-i18next';
 import IContact from './interfaces/contact.interface';
 import {RootStackParamList} from '../screens/types/NavigationTypes';
-import Config from '../../config'; // Import the Config
+import Config from '../../config';
+
+type AddContactRouteProp = RouteProp<RootStackParamList, 'AddContact'>;
 
 const AddContact = () => {
     const {t} = useTranslation();
+    const route = useRoute<AddContactRouteProp>();
+    const initialLocation = route.params?.location || null;
+
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [contactType, setContactType] = useState('Client');
     const [imageUri, setImageUri] = useState('');
-    const [location, setLocation] = useState<{latitude: number; longitude: number} | null>(null);
+    const [location] = useState<{latitude: number; longitude: number} | null>(initialLocation);
 
     const {addContact} = useContacts();
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -34,21 +39,12 @@ const AddContact = () => {
             includeBase64: true,
         };
 
-        let result: ImagePickerResponse;
-
-        if (source === 'camera') {
-            result = await launchCamera(options);
-        } else {
-            result = await launchImageLibrary(options);
-        }
+        const result =
+            source === 'camera' ? await launchCamera(options) : await launchImageLibrary(options);
 
         if (result.assets && result.assets.length > 0) {
             const uri = result.assets[0].uri;
-            if (uri) {
-                setImageUri(uri);
-            } else {
-                Alert.alert('Error', 'Failed to get image URI');
-            }
+            uri ? setImageUri(uri) : Alert.alert('Error', 'Failed to get image URI');
         } else {
             Alert.alert('Error', 'Failed to pick an image');
         }
@@ -60,16 +56,14 @@ const AddContact = () => {
             return;
         }
 
-        const currentContacts = []; // Replace this with your actual contacts array
-
         const newContact: IContact = {
-            id: currentContacts.length + 1, // Simple incremental ID
+            id: Date.now(), // Unique ID based on timestamp
             name,
             phone,
             email,
             image: imageUri,
             isEmployee: contactType === 'Employee',
-            location: location, // Ensure correct location is saved
+            location,
         };
 
         addContact(newContact);
@@ -78,14 +72,9 @@ const AddContact = () => {
     };
 
     const handleLocationSelect = () => {
-        navigation.navigate('SelectLocation', {
-            onLocationSelected: (loc: {latitude: number; longitude: number}) => {
-                setLocation(loc); // Ensure location is passed and set correctly
-            },
-        });
+        navigation.navigate('SelectLocation');
     };
 
-    // Example usage of the API Key (if needed for functionality)
     console.log('Using API Key:', Config.apiKey);
 
     return (
@@ -135,6 +124,16 @@ const AddContact = () => {
                 <FontAwesome name="map-marker" size={20} color={colors.text} />
                 <Text style={[styles.buttonText, {color: colors.text}]}>{t('selectLocation')}</Text>
             </TouchableOpacity>
+
+            {location && (
+                <View style={styles.locationContainer}>
+                    <Text style={styles.locationText}>
+                        {t('selectedLocation')}:{' '}
+                        {`Lat: ${location.latitude}, Long: ${location.longitude}`}
+                    </Text>
+                </View>
+            )}
+
             <View style={styles.buttonContainer}>
                 <TouchableOpacity onPress={() => handleImagePick('gallery')} style={styles.button}>
                     <FontAwesome name="photo" size={20} color={colors.text} />
@@ -216,6 +215,12 @@ const styles = StyleSheet.create({
         marginTop: 6,
         marginBottom: 6,
         textAlign: 'center',
+    },
+    locationContainer: {
+        marginVertical: 10,
+    },
+    locationText: {
+        color: '#555',
     },
 });
 
