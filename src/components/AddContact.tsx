@@ -13,6 +13,7 @@ import {useTranslation} from 'react-i18next';
 import IContact from './interfaces/contact.interface';
 import {RootStackParamList} from '../screens/types/NavigationTypes';
 import Config from '../../config';
+import MapView, {Marker} from 'react-native-maps';
 
 type AddContactRouteProp = RouteProp<RootStackParamList, 'AddContact'>;
 
@@ -133,8 +134,19 @@ const AddContact = () => {
                 <Text style={[styles.buttonText, {color: colors.text}]}>{t('selectLocation')}</Text>
             </TouchableOpacity>
 
+            {/* Show map if location is selected */}
             {location && (
-                <View style={styles.locationContainer}>
+                <View style={styles.mapContainer}>
+                    <MapView
+                        style={styles.map}
+                        initialRegion={{
+                            latitude: location.latitude,
+                            longitude: location.longitude,
+                            latitudeDelta: 0.0922,
+                            longitudeDelta: 0.0421,
+                        }}>
+                        <Marker coordinate={location} />
+                    </MapView>
                     <Text style={styles.locationText}>
                         {t('selectedLocation')}: Lat: {location.latitude}, Long:{' '}
                         {location.longitude}
@@ -224,11 +236,18 @@ const styles = StyleSheet.create({
         marginBottom: 6,
         textAlign: 'center',
     },
-    locationContainer: {
-        marginVertical: 10,
+    mapContainer: {
+        height: 250, // Adjust size as needed
+        marginVertical: 20,
+    },
+    map: {
+        flex: 1,
+        borderRadius: 10,
     },
     locationText: {
         color: '#555',
+        textAlign: 'center',
+        marginTop: 10,
     },
 });
 
