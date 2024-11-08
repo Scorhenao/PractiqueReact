@@ -1,5 +1,14 @@
 import React, {useState, useEffect} from 'react';
-import {View, TextInput, TouchableOpacity, Image, StyleSheet, Alert, Text} from 'react-native';
+import {
+    View,
+    TextInput,
+    TouchableOpacity,
+    Image,
+    StyleSheet,
+    Alert,
+    Text,
+    ScrollView,
+} from 'react-native';
 import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {Picker} from '@react-native-picker/picker';
@@ -14,6 +23,7 @@ import IContact from './interfaces/contact.interface';
 import {RootStackParamList} from '../screens/types/NavigationTypes';
 import Config from '../../config';
 import MapView, {Marker} from 'react-native-maps';
+import axios from 'axios';
 
 type AddContactRouteProp = RouteProp<RootStackParamList, 'AddContact'>;
 
@@ -35,6 +45,9 @@ const AddContact = () => {
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const {darkMode} = useTheme();
     const colors = darkMode ? colorsDarkMode : colorsLightMode;
+    const [weather, setWeather] = useState<any>(null);
+
+    const apiKey = Config.openWeatherMapKey;
 
     useEffect(() => {
         if (route.params?.location) {
@@ -66,7 +79,7 @@ const AddContact = () => {
         }
 
         const newContact: IContact = {
-            id: Date.now(), // Unique ID based on timestamp
+            id: Date.now(),
             name,
             phone,
             email,
@@ -84,94 +97,156 @@ const AddContact = () => {
         navigation.navigate('SelectLocation' as any, {location});
     };
 
-    console.log('Using API Key:', Config.apiKey);
+    // Fetch weather when location is set
+    useEffect(() => {
+        if (location) {
+            const fetchWeather = async () => {
+                try {
+                    const response = await axios.get(
+                        `https://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=${apiKey}&units=metric`,
+                    );
+                    setWeather(response.data);
+                } catch (error: any) {
+                    Alert.alert('Error', 'Unable to fetch weather data');
+                }
+            };
+
+            fetchWeather();
+        }
+    }, [location]);
+
+    // Determine icon based on weather
+    const getWeatherIcon = () => {
+        if (!weather) {
+            return 'cloud';
+        }
+        const mainWeather = weather.weather[0].main.toLowerCase().trim(); // Added .trim() to remove extra spaces
+
+        if (mainWeather === 'clear') {
+            return 'sun'; // Matches clear weather
+        }
+        if (mainWeather === 'clouds') {
+            return 'cloud'; // Handles cloud cover
+        }
+        if (mainWeather === 'rain') {
+            return 'cloud-rain'; // Handles rain
+        }
+        if (mainWeather === 'snow') {
+            return 'snowflake'; // Handles snow
+        }
+        return 'cloud'; // Default fallback
+    };
 
     return (
         <View style={[styles.container, {backgroundColor: colors.background}]}>
-            <View style={styles.imageContainer}>
-                {imageUri ? (
-                    <Image source={{uri: imageUri}} style={styles.image} />
-                ) : (
-                    <Text style={styles.noImageSelected}>{t('noImageSelected')}</Text>
-                )}
-            </View>
-            <TextInput
-                placeholder={t('namePlaceholder')}
-                placeholderTextColor={colors.placeholder}
-                style={[
-                    styles.input,
-                    {backgroundColor: colors.inputBackground, color: colors.text},
-                ]}
-                onChangeText={setName}
-            />
-            <TextInput
-                placeholder={t('phonePlaceholder')}
-                placeholderTextColor={colors.placeholder}
-                style={[
-                    styles.input,
-                    {backgroundColor: colors.inputBackground, color: colors.text},
-                ]}
-                onChangeText={setPhone}
-            />
-            <TextInput
-                placeholder={t('emailPlaceholder')}
-                placeholderTextColor={colors.placeholder}
-                style={[
-                    styles.input,
-                    {backgroundColor: colors.inputBackground, color: colors.text},
-                ]}
-                onChangeText={setEmail}
-            />
-            <Picker
-                selectedValue={contactType}
-                style={{color: colors.text, backgroundColor: colors.inputBackground}}
-                onValueChange={itemValue => setContactType(itemValue)}>
-                <Picker.Item label={t('client')} value="Client" />
-                <Picker.Item label={t('employee')} value="Employee" />
-            </Picker>
-            <TouchableOpacity onPress={handleLocationSelect} style={styles.button}>
-                <FontAwesome name="map-marker" size={20} color={colors.text} />
-                <Text style={[styles.buttonText, {color: colors.text}]}>{t('selectLocation')}</Text>
-            </TouchableOpacity>
+            <ScrollView>
+                <View style={[styles.container, {backgroundColor: colors.background}]}>
+                    <View style={styles.imageContainer}>
+                        {imageUri ? (
+                            <Image source={{uri: imageUri}} style={styles.image} />
+                        ) : (
+                            <Text style={styles.noImageSelected}>{t('noImageSelected')}</Text>
+                        )}
+                    </View>
+                    <TextInput
+                        placeholder={t('namePlaceholder')}
+                        placeholderTextColor={colors.placeholder}
+                        style={[
+                            styles.input,
+                            {backgroundColor: colors.inputBackground, color: colors.text},
+                        ]}
+                        onChangeText={setName}
+                    />
+                    <TextInput
+                        placeholder={t('phonePlaceholder')}
+                        placeholderTextColor={colors.placeholder}
+                        style={[
+                            styles.input,
+                            {backgroundColor: colors.inputBackground, color: colors.text},
+                        ]}
+                        onChangeText={setPhone}
+                    />
+                    <TextInput
+                        placeholder={t('emailPlaceholder')}
+                        placeholderTextColor={colors.placeholder}
+                        style={[
+                            styles.input,
+                            {backgroundColor: colors.inputBackground, color: colors.text},
+                        ]}
+                        onChangeText={setEmail}
+                    />
+                    <Picker
+                        selectedValue={contactType}
+                        style={{color: colors.text, backgroundColor: colors.inputBackground}}
+                        onValueChange={itemValue => setContactType(itemValue)}>
+                        <Picker.Item label={t('client')} value="Client" />
+                        <Picker.Item label={t('employee')} value="Employee" />
+                    </Picker>
+                    <TouchableOpacity onPress={handleLocationSelect} style={styles.button}>
+                        <FontAwesome name="map-marker" size={20} color={colors.text} />
+                        <Text style={[styles.buttonText, {color: colors.text}]}>
+                            {t('selectLocation')}
+                        </Text>
+                    </TouchableOpacity>
 
-            {/* Show map if location is selected */}
-            {location && (
-                <View style={styles.mapContainer}>
-                    <MapView
-                        style={styles.map}
-                        initialRegion={{
-                            latitude: location.latitude,
-                            longitude: location.longitude,
-                            latitudeDelta: 0.0922,
-                            longitudeDelta: 0.0421,
-                        }}>
-                        <Marker coordinate={location} />
-                    </MapView>
-                    <Text style={styles.locationText}>
-                        {t('selectedLocation')}: Lat: {location.latitude}, Long:{' '}
-                        {location.longitude}
-                    </Text>
+                    {/* Show map if location is selected */}
+                    {location && (
+                        <View style={styles.mapContainer}>
+                            <MapView
+                                style={styles.map}
+                                initialRegion={{
+                                    latitude: location.latitude,
+                                    longitude: location.longitude,
+                                    latitudeDelta: 0.0922,
+                                    longitudeDelta: 0.0421,
+                                }}>
+                                <Marker coordinate={location} />
+                            </MapView>
+                            <Text style={styles.locationText}>
+                                {t('selectedLocation')}: Lat: {location.latitude}, Long:{' '}
+                                {location.longitude}
+                            </Text>
+                        </View>
+                    )}
+
+                    {/* Display weather if available */}
+                    {weather ? (
+                        <View style={styles.weatherContainer}>
+                            <FontAwesome name={getWeatherIcon()} size={24} color={colors.text} />
+                            <Text style={styles.weatherText}>
+                                {weather.weather[0].description}, {weather.main.temp}°C
+                            </Text>
+                        </View>
+                    ) : (
+                        <Text style={styles.noWeatherText}>
+                            Select a location to see the weather
+                        </Text>
+                    )}
+
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            onPress={() => handleImagePick('gallery')}
+                            style={styles.button}>
+                            <FontAwesome name="photo" size={20} color={colors.text} />
+                            <Text style={[styles.buttonText, {color: colors.text}]}>
+                                {t('chooseImage')}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => handleImagePick('camera')}
+                            style={styles.button}>
+                            <FontAwesome name="camera" size={20} color={colors.text} />
+                            <Text style={[styles.buttonText, {color: colors.text}]}>
+                                {t('takePicture')}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
+                        <FontAwesome name="save" size={20} color="#fff" />
+                        <Text style={styles.saveButtonText}>{t('save')}</Text>
+                    </TouchableOpacity>
                 </View>
-            )}
-
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={() => handleImagePick('gallery')} style={styles.button}>
-                    <FontAwesome name="photo" size={20} color={colors.text} />
-                    <Text style={[styles.buttonText, {color: colors.text}]}>
-                        {t('chooseImage')}
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleImagePick('camera')} style={styles.button}>
-                    <FontAwesome name="camera" size={20} color={colors.text} />
-                    <Text style={[styles.buttonText, {color: colors.text}]}>
-                        {t('takePicture')}
-                    </Text>
-                </TouchableOpacity>
-            </View>
-            <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-                <FontAwesome name="save" size={20} color="#fff" />
-                <Text style={styles.saveButtonText}>{t('save')}</Text>
-            </TouchableOpacity>
+            </ScrollView>
         </View>
     );
 };
@@ -248,6 +323,17 @@ const styles = StyleSheet.create({
         color: '#555',
         textAlign: 'center',
         marginTop: 10,
+    },
+    weatherContainer: {
+        marginTop: 20,
+    },
+    weatherText: {
+        fontSize: 18,
+        marginBottom: 5,
+    },
+    noWeatherText: {
+        fontSize: 16,
+        color: 'gray',
     },
 });
 
