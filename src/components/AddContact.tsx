@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, TextInput, TouchableOpacity, Image, StyleSheet, Alert, Text} from 'react-native';
 import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -26,12 +26,20 @@ const AddContact = () => {
     const [email, setEmail] = useState('');
     const [contactType, setContactType] = useState('Client');
     const [imageUri, setImageUri] = useState('');
-    const [location] = useState<{latitude: number; longitude: number} | null>(initialLocation);
+    const [location, setLocation] = useState<{latitude: number; longitude: number} | null>(
+        initialLocation,
+    );
 
     const {addContact} = useContacts();
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const {darkMode} = useTheme();
     const colors = darkMode ? colorsDarkMode : colorsLightMode;
+
+    useEffect(() => {
+        if (route.params?.location) {
+            setLocation(route.params.location);
+        }
+    }, [route.params?.location]);
 
     const handleImagePick = async (source: 'camera' | 'gallery') => {
         const options = {
@@ -72,7 +80,7 @@ const AddContact = () => {
     };
 
     const handleLocationSelect = () => {
-        navigation.navigate('SelectLocation');
+        navigation.navigate('SelectLocation' as any, {location});
     };
 
     console.log('Using API Key:', Config.apiKey);
@@ -128,8 +136,8 @@ const AddContact = () => {
             {location && (
                 <View style={styles.locationContainer}>
                     <Text style={styles.locationText}>
-                        {t('selectedLocation')}:{' '}
-                        {`Lat: ${location.latitude}, Long: ${location.longitude}`}
+                        {t('selectedLocation')}: Lat: {location.latitude}, Long:{' '}
+                        {location.longitude}
                     </Text>
                 </View>
             )}

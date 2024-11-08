@@ -26,6 +26,7 @@ const resources = {
             delete: 'Delete',
             close: 'Close',
             role: 'Role',
+            save: 'save',
         },
     },
     es: {
@@ -50,6 +51,7 @@ const resources = {
             delete: 'Eliminar',
             close: 'Cerrar',
             role: 'Rol',
+            save: 'Guardar',
         },
     },
 };
