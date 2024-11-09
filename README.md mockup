@@ -1,0 +1,152 @@
+Aquí tienes una versión combinada de la maqueta con el contenido adicional sobre React Native. Este formato en Markdown proporciona una documentación detallada y amigable para comenzar a trabajar con una aplicación de React Native.
+
+```markdown
+# Documentación de la Aplicación Móvil - [Nombre de la App]
+
+## Descripción General
+
+**[Nombre de la App]** es una aplicación móvil desarrollada en **[React Native](https://reactnative.dev)** que permite a los usuarios **[descripción breve de las funcionalidades principales, como gestionar contactos, realizar compras, etc.]**. Este proyecto fue creado usando [`@react-native-community/cli`](https://github.com/react-native-community/cli) y está disponible para plataformas **Android e iOS**.
+
+## Tecnologías Utilizadas
+
+- **Framework**: React Native
+- **Lenguajes**: TypeScript, JavaScript
+- **Dependencias Principales**:
+  - [Dependencia 1] - [Descripción breve de para qué se utiliza]
+  - [Dependencia 2] - [Descripción breve de para qué se utiliza]
+
+## Estructura de Carpetas
+
+```plaintext
+src/
+│
+├── components/         # Componentes reutilizables de la aplicación
+├── screens/            # Vistas principales o pantallas de la aplicación
+├── navigation/         # Configuración de la navegación
+├── assets/             # Imágenes, iconos, y otros recursos
+├── services/           # Servicios y API de la app
+├── theme/              # Paleta de colores y configuración de temas
+└── utils/              # Funciones utilitarias y helpers
+```
+
+## Configuración Inicial
+
+### Paso 1: Requisitos Previos
+
+> **Nota**: Asegúrate de completar las instrucciones en [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) hasta el paso "Creating a new application" antes de continuar.
+
+### Paso 2: Iniciar el Servidor Metro
+
+**Metro** es el _bundler_ de JavaScript que se incluye con React Native. Desde la raíz del proyecto, ejecuta el siguiente comando para iniciarlo:
+
+```bash
+# usando npm
+npm start
+
+# o usando Yarn
+yarn start
+```
+
+### Paso 3: Ejecutar la Aplicación
+
+Con el Metro Bundler ejecutándose en una terminal, abre una nueva terminal en la raíz del proyecto y ejecuta el siguiente comando para iniciar tu aplicación en **Android** o **iOS**:
+
+#### Para Android
+
+```bash
+# usando npm
+npm run android
+
+# o usando Yarn
+yarn android
+```
+
+#### Para iOS
+
+```bash
+# usando npm
+npm run ios
+
+# o usando Yarn
+yarn ios
+```
+
+Si todo está configurado correctamente, verás tu aplicación ejecutándose en el emulador de Android o en el simulador de iOS.
+
+## Modificando tu Aplicación
+
+Una vez que tengas la aplicación en funcionamiento, sigue estos pasos para realizar cambios básicos:
+
+1. Abre `App.tsx` en tu editor de texto y realiza modificaciones.
+2. Para **Android**: Presiona <kbd>R</kbd> dos veces o selecciona **"Reload"** desde el **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> en Windows/Linux o <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> en macOS).
+   
+   Para **iOS**: Presiona <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> en el simulador de iOS.
+
+## Funcionalidades
+
+### Pantallas Principales
+
+1. **Pantalla de Inicio**:
+   - **Descripción**: Muestra [descripción general de la funcionalidad principal].
+   - **Componentes**: [Componentes principales de esta pantalla].
+   - **Datos Utilizados**: Describe los datos mostrados en esta pantalla.
+
+2. **Pantalla de [Otra Pantalla Importante]**:
+   - **Descripción**: [Describe su funcionalidad].
+   - **Componentes**: [Componentes principales].
+   - **Interacción**: Describe si la pantalla permite realizar acciones como editar o eliminar elementos.
+
+### Navegación
+
+La aplicación utiliza **[react-navigation]**. El flujo de navegación es el siguiente:
+
+- **[Inicio]** ➔ **[Detalles]**
+- **[Pantalla Principal]** ➔ **[Pantalla de Configuración]**
+
+## Configuración de Temas
+
+La app incluye soporte para **modo claro** y **modo oscuro**. La configuración de temas está en `src/theme/` y define los colores y estilos globales. 
+
+### Ejemplo de Paleta de Colores
+
+```javascript
+// colors.js
+export default {
+  primary: '#A8DCE7',
+  background: '#101422',
+  text: '#FFFFFF',
+  accent: '#272B3B',
+};
+```
+
+## Buenas Prácticas y Estilo de Código
+
+- **Uso de Hooks**: Utilizar `useState`, `useEffect`, y `useContext` para la gestión del estado y contextos globales.
+- **Modularización**: Dividir en componentes reutilizables dentro de `src/components`.
+- **Uso de TypeScript**: Para una mejor definición de tipos y mayor robustez en el código.
+
+## Resolución de Problemas
+
+Si encuentras problemas al ejecutar la aplicación, revisa la página de [Troubleshooting](https://reactnative.dev/docs/troubleshooting) en la documentación de React Native.
+
+## Recursos Adicionales
+
+Para aprender más sobre React Native, consulta los siguientes recursos:
+
+- [React Native Website](https://reactnative.dev)
+- [Getting Started](https://reactnative.dev/docs/environment-setup)
+- [Learn the Basics](https://reactnative.dev/docs/getting-started)
+- [Blog](https://reactnative.dev/blog)
+- [`@facebook/react-native`](https://github.com/facebook/react-native) - Repositorio oficial de código abierto en GitHub.
+
+## Contacto y Contribución
+
+- **Contacto**: Para cualquier duda o sugerencia, puedes contactar a [tu correo o usuario de GitHub].
+- **Contribuciones**: Las contribuciones son bienvenidas. Haz un fork del proyecto, crea una rama para tu funcionalidad, y envía un pull request.
+
+## Licencia
+
+Este proyecto está bajo la Licencia **[Nombre de la Licencia, como MIT]**.
+```
+
+Esta combinación incluye instrucciones de inicio y configuración, así como una estructura de documentación más amplia sobre la arquitectura y el funcionamiento general de la app, lo que te servirá para guiar a otros desarrolladores en la comprensión y uso del proyecto.
