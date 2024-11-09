@@ -7,9 +7,11 @@ import i18n from '../i18n'; // Importing the i18n configuration
 import colorsDarkMode from '../theme/colorsLightMode';
 import colorsLightMode from '../theme/colorsDarkMode';
 import {useTheme} from '../theme/themeContext'; // Import the Theme Context
+import {useNavigation} from '@react-navigation/native'; // For navigation
 
 const NavBar = () => {
     const [showMenu, setShowMenu] = useState(false);
+    const navigation = useNavigation();
     const [showSearch, setShowSearch] = useState(false);
     const [search, setSearch] = useState('');
     const [language, setLanguage] = useState('US'); // Default to English ('US')
@@ -84,7 +86,10 @@ const NavBar = () => {
                         </TouchableOpacity>
 
                         {/* Settings Button */}
-                        <TouchableOpacity style={styles.menuItem}>
+                        <TouchableOpacity
+                            style={styles.menuItem}
+                            onPress={() => navigation.navigate('SettingsScreen')} // Fix the navigation action
+                        >
                             <FontAwesome name="cog" size={20} color={colors.text} />
                             <Text style={[styles.menuItemText, {color: colors.text}]}>
                                 {i18n.t('settings')}

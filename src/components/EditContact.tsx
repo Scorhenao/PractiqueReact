@@ -1,5 +1,14 @@
 import React, {useState, useEffect} from 'react';
-import {View, TextInput, Alert, StyleSheet, TouchableOpacity, Text, Image} from 'react-native';
+import {
+    View,
+    TextInput,
+    Alert,
+    StyleSheet,
+    TouchableOpacity,
+    Text,
+    Image,
+    ScrollView,
+} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../screens/AppNavigator';
@@ -104,92 +113,100 @@ const EditContact: React.FC = () => {
 
     return (
         <View style={[styles.container, {backgroundColor: colors.background}]}>
-            {/* Contact Image */}
-            <TouchableOpacity onPress={handleImagePick} style={styles.imageContainer}>
-                {image ? (
-                    <Image source={{uri: image}} style={styles.image} />
-                ) : (
-                    <FontAwesome name="user-circle" size={100} color={colors.placeholder} />
-                )}
-                <TouchableOpacity style={styles.editIconContainer} onPress={handleImagePick}>
-                    <FontAwesome name="pencil" size={24} color="#fff" />
+            <ScrollView>
+                {/* Contact Image */}
+                <TouchableOpacity onPress={handleImagePick} style={styles.imageContainer}>
+                    {image ? (
+                        <Image source={{uri: image}} style={styles.image} />
+                    ) : (
+                        <FontAwesome name="user-circle" size={100} color={colors.placeholder} />
+                    )}
+                    <TouchableOpacity style={styles.editIconContainer} onPress={handleImagePick}>
+                        <FontAwesome name="pencil" size={24} color="#fff" />
+                    </TouchableOpacity>
                 </TouchableOpacity>
-            </TouchableOpacity>
 
-            {/* Name, Phone, Email Inputs */}
-            <View style={styles.inputContainer}>
-                <FontAwesome name="user" size={20} color={colors.icon} style={styles.icon} />
-                <TextInput
-                    placeholder={t('namePlaceholder')}
-                    value={name}
-                    onChangeText={setName}
-                    style={[
-                        styles.input,
-                        {backgroundColor: colors.inputBackground, color: colors.text},
-                    ]}
-                />
-            </View>
-            <View style={styles.inputContainer}>
-                <FontAwesome name="phone" size={20} color={colors.icon} style={styles.icon} />
-                <TextInput
-                    placeholder={t('phonePlaceholder')}
-                    value={phone}
-                    onChangeText={setPhone}
-                    style={[
-                        styles.input,
-                        {backgroundColor: colors.inputBackground, color: colors.text},
-                    ]}
-                />
-            </View>
-            <View style={styles.inputContainer}>
-                <FontAwesome name="envelope" size={20} color={colors.icon} style={styles.icon} />
-                <TextInput
-                    placeholder={t('emailPlaceholder')}
-                    value={email}
-                    onChangeText={setEmail}
-                    style={[
-                        styles.input,
-                        {backgroundColor: colors.inputBackground, color: colors.text},
-                    ]}
-                />
-            </View>
+                {/* Name, Phone, Email Inputs */}
+                <View style={styles.inputContainer}>
+                    <FontAwesome name="user" size={20} color={colors.icon} style={styles.icon} />
+                    <TextInput
+                        placeholder={t('namePlaceholder')}
+                        value={name}
+                        onChangeText={setName}
+                        style={[
+                            styles.input,
+                            {backgroundColor: colors.inputBackground, color: colors.text},
+                        ]}
+                    />
+                </View>
+                <View style={styles.inputContainer}>
+                    <FontAwesome name="phone" size={20} color={colors.icon} style={styles.icon} />
+                    <TextInput
+                        placeholder={t('phonePlaceholder')}
+                        value={phone}
+                        onChangeText={setPhone}
+                        style={[
+                            styles.input,
+                            {backgroundColor: colors.inputBackground, color: colors.text},
+                        ]}
+                    />
+                </View>
+                <View style={styles.inputContainer}>
+                    <FontAwesome
+                        name="envelope"
+                        size={20}
+                        color={colors.icon}
+                        style={styles.icon}
+                    />
+                    <TextInput
+                        placeholder={t('emailPlaceholder')}
+                        value={email}
+                        onChangeText={setEmail}
+                        style={[
+                            styles.input,
+                            {backgroundColor: colors.inputBackground, color: colors.text},
+                        ]}
+                    />
+                </View>
 
-            {/* Contact Type Picker */}
-            <Picker
-                selectedValue={contactType}
-                onValueChange={itemValue => setContactType(itemValue)}
-                style={{color: colors.text, backgroundColor: colors.inputBackground}}>
-                <Picker.Item label={t('employee')} value="Employee" />
-                <Picker.Item label={t('client')} value="Client" />
-            </Picker>
+                {/* Contact Type Picker */}
+                <Picker
+                    selectedValue={contactType}
+                    onValueChange={itemValue => setContactType(itemValue)}
+                    style={{color: colors.text, backgroundColor: colors.inputBackground}}>
+                    <Picker.Item label={t('employee')} value="Employee" />
+                    <Picker.Item label={t('client')} value="Client" />
+                </Picker>
 
-            {/* Map View */}
-            <View style={styles.mapContainer}>
-                <MapView
-                    style={styles.map}
-                    initialRegion={{
-                        latitude: location.latitude,
-                        longitude: location.longitude,
-                        latitudeDelta: 0.0922,
-                        longitudeDelta: 0.0421,
-                    }}
-                    onPress={e => setLocation(e.nativeEvent.coordinate)}>
-                    <Marker coordinate={location} />
-                </MapView>
-                {weather && (
-                    <View style={styles.weatherContainer}>
-                        <Text style={styles.weatherText}>
-                            {t('weather')}: {weather.main.temp}°C, {weather.weather[0].description}
-                        </Text>
-                    </View>
-                )}
-            </View>
+                {/* Map View */}
+                <View style={styles.mapContainer}>
+                    <MapView
+                        style={styles.map}
+                        initialRegion={{
+                            latitude: location.latitude,
+                            longitude: location.longitude,
+                            latitudeDelta: 0.0922,
+                            longitudeDelta: 0.0421,
+                        }}
+                        onPress={e => setLocation(e.nativeEvent.coordinate)}>
+                        <Marker coordinate={location} />
+                    </MapView>
+                    {weather && (
+                        <View style={styles.weatherContainer}>
+                            <Text style={styles.weatherText}>
+                                {t('weather')}: {weather.main.temp}°C,{' '}
+                                {weather.weather[0].description}
+                            </Text>
+                        </View>
+                    )}
+                </View>
 
-            {/* Save Button */}
-            <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-                <FontAwesome name="save" size={20} color="#fff" />
-                <Text style={styles.saveButtonText}>{t('save')}</Text>
-            </TouchableOpacity>
+                {/* Save Button */}
+                <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
+                    <FontAwesome name="save" size={20} color="#fff" />
+                    <Text style={styles.saveButtonText}>{t('save')}</Text>
+                </TouchableOpacity>
+            </ScrollView>
         </View>
     );
 };
