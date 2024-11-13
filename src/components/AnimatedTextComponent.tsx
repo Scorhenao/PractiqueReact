@@ -7,6 +7,9 @@ import Animated, {
     withDelay,
     runOnJS,
 } from 'react-native-reanimated';
+import { useTheme } from '../theme/themeContext';
+import colorsLightMode from '../theme/colorsLightMode';
+import colorsDarkMode from '../theme/colorsDarkMode';
 
 const DURATION = 5000; // Increased duration to make each fade-in much slower
 const DELAY = 1000; // Increased delay to make the words appear more spaced out
@@ -20,6 +23,10 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({onFinished}) => {
     const opacity1 = useSharedValue(0);
     const opacity2 = useSharedValue(0);
     const opacity3 = useSharedValue(0);
+
+    const {darkMode} = useTheme();
+    const colors = darkMode ? colorsLightMode : colorsDarkMode;
+
 
     useEffect(() => {
         // Modify the delay to control when each element fades in
@@ -41,7 +48,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({onFinished}) => {
         <View style={styles.container}>
             <Animated.Text style={[styles.text, animatedStyle1]}>{text[0]}</Animated.Text>
             <Animated.Text style={[styles.text, animatedStyle2]}>{text[1]}</Animated.Text>
-            <Animated.Text style={[styles.text, animatedStyle3]}>{text[2]}</Animated.Text>
+            <Animated.Text style={[styles.text, animatedStyle3, {color: colors.link}]}>{text[2]}</Animated.Text>
         </View>
     );
 };
