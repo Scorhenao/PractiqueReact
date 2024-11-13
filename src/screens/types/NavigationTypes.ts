@@ -2,10 +2,11 @@ import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import IContact from '../../components/interfaces/contact.interface';
 export type RootStackParamList = {
-    Home: undefined;
-    AddContact: {location: {latitude: number; longitude: number}};
+    AppContainer: undefined;
+    AddContact: undefined;
     EditContact: {contact: IContact};
-    SelectLocation: {onLocationSelected: (loc: {latitude: number; longitude: number}) => void};
+    ViewContact: {contact: IContact};
+    SelectLocation: {onLocationSelected: (loc: {latitude: string; longitude: string}) => void}; // Agregar SelectLocation con sus parámetros
     SettingsScreen: undefined;
 };
 
