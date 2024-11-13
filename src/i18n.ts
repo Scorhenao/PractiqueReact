@@ -27,6 +27,11 @@ const resources = {
             close: 'Close',
             role: 'Role',
             save: 'save',
+            NoImageSelected: '¡No Image Selected!',
+            selectLocation: 'Select Location',
+            noWeather: 'Select a location to see the weather',
+            chooseImage: 'Choose Image',
+            takePicture: 'Take Picture',
         },
     },
     es: {
@@ -52,6 +57,11 @@ const resources = {
             close: 'Cerrar',
             role: 'Rol',
             save: 'Guardar',
+            NoImageSelected: '¡No se ha seleccionado ninguna imagen!',
+            selectLocation: 'Seleccionar Ubicación',
+            noWeather: 'Selecciona una ubicación para ver el clima',
+            chooseImage: 'Seleccionar Imagen',
+            takePicture: 'Tomar Foto',
         },
     },
 };

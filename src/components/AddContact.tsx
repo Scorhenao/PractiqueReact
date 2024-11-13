@@ -145,7 +145,7 @@ const AddContact = () => {
                         {imageUri ? (
                             <Image source={{uri: imageUri}} style={styles.image} />
                         ) : (
-                            <Text style={styles.noImageSelected}>{t('noImageSelected')}</Text>
+                            <Text style={styles.noImageSelected}>{t('NoImageSelected')}</Text>
                         )}
                     </View>
                     <TextInput
@@ -219,7 +219,7 @@ const AddContact = () => {
                         </View>
                     ) : (
                         <Text style={styles.noWeatherText}>
-                            Select a location to see the weather
+                            {t('noWeather')}
                         </Text>
                     )}
 
