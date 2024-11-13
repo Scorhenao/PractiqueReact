@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
-import {View, Text, Button, StyleSheet} from 'react-native';
-import Contacts from 'react-native-contacts';
+import {View, Text, Button, StyleSheet, ActivityIndicator, Alert} from 'react-native';
 import ContactCard from '../components/ContactCard';
+import {syncContacts} from '../services/contactsService'; // Import the sync service
+import {useNavigation} from '@react-navigation/native'; // For navigation
 
 interface Contact {
     recordID: string;
@@ -9,50 +10,57 @@ interface Contact {
     phoneNumbers: {number: string}[];
     emailAddresses: {email: string}[];
     thumbnailPath: string;
-    // Add other properties as needed
 }
 
 const SettingsScreen = () => {
-    const [contacts, setContacts] = useState<Contact[]>([]); // Explicitly setting type to Contact[]
+    const [contacts, setContacts] = useState<Contact[]>([]);
+    const [loading, setLoading] = useState(false);
+    const navigation = useNavigation(); // For navigation after sync
 
-    const syncContacts = async () => {
+    const handleSyncContacts = async () => {
+        setLoading(true);
         try {
-            const permission = await Contacts.requestPermission();
-            if (permission === 'authorized') {
-                const allContacts = await Contacts.getAll();
-                console.log('Fetched Contacts:', allContacts);
-                setContacts(allContacts); // Update the state with Contact[]
-            } else {
-                console.log('Permission denied');
-            }
+            const syncedContacts = await syncContacts(); // Use syncContacts service
+            setContacts(syncedContacts);
+            // Navigate to 'AppContainer' with the synced contacts
+            navigation.navigate('AppContainer', {syncedContacts});
         } catch (error) {
-            console.log('Error syncing contacts:', error);
+            // If an error occurs, show an alert
+            Alert.alert('Error', 'Failed to sync contacts. Please try again.');
+        } finally {
+            setLoading(false);
         }
+    };
+
+    const handleDeleteContact = (recordID: string) => {
+        setContacts(prevContacts => prevContacts.filter(contact => contact.recordID !== recordID));
     };
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Settings</Text>
-            <Button title="Sync Contacts" onPress={syncContacts} />
-
-            {contacts.map((contact, index) => (
-                <ContactCard
-                    key={index}
-                    contact={{
-                        id: Number(contact.recordID), // Convertimos recordID a número
-                        name: contact.givenName,
-                        phone: contact.phoneNumbers[0]?.number || '',
-                        email: contact.emailAddresses[0]?.email || '',
-                        image: contact.thumbnailPath || '',
-                        isEmployee: false,
-                        location: null,
-                    }}
-                    darkMode={false}
-                    onDelete={(id: number) =>
-                        setContacts(contacts.filter(c => Number(c.recordID) !== id))
-                    }
-                />
-            ))}
+            {/* Button to sync contacts */}
+            <Button title="Sync Contacts" onPress={handleSyncContacts} />
+            {loading && <ActivityIndicator size="large" color="#0000ff" />}
+            {/* Show contacts after syncing */}
+            {!loading &&
+                contacts.length > 0 &&
+                contacts.map(contact => (
+                    <ContactCard
+                        key={contact.recordID} // Use recordID as the unique key
+                        contact={{
+                            id: Number(contact.recordID),
+                            name: contact.givenName,
+                            phone: contact.phoneNumbers[0]?.number || '',
+                            email: contact.emailAddresses[0]?.email || '',
+                            image: contact.thumbnailPath || '',
+                            isEmployee: false,
+                            location: null,
+                        }}
+                        darkMode={false}
+                        onDelete={() => handleDeleteContact(contact.recordID)} // Deleting contacts
+                    />
+                ))}
         </View>
     );
 };

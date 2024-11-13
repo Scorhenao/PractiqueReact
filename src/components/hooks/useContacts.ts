@@ -1,13 +1,13 @@
 import {useState, useEffect, useCallback} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IContact from '../interfaces/contact.interface';
-import { useIsFocused } from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 
 const useContacts = () => {
     const [contacts, setContacts] = useState<IContact[]>([]);
     const focused = useIsFocused();
 
-    // take contacts saved in AsyncStorage
+    // load contacts from AsyncStorage
     const loadContacts = useCallback(async () => {
         const storedContacts = await retrieveContacts();
         if (storedContacts) {
@@ -15,7 +15,7 @@ const useContacts = () => {
         }
     }, []);
 
-    // Take storage contact and return an empty array if error
+    // Retrieve contacts from AsyncStorage
     const retrieveContacts = async (): Promise<IContact[]> => {
         try {
             const storedData = await AsyncStorage.getItem('contacts');
@@ -26,11 +26,11 @@ const useContacts = () => {
         }
     };
 
-    // Add new contect to the list and save it in AsyncStorage
+    // Add a new contact and save it in AsyncStorage
     const addContact = async (newContact: IContact) => {
         const contactWithId = {
             ...newContact,
-            id: Date.now(), // O usa una librería para generar IDs únicos
+            id: Date.now(), // or use a library to generate unique IDs
         };
         const updatedContacts = [...contacts, contactWithId];
         setContacts(updatedContacts);
@@ -53,7 +53,7 @@ const useContacts = () => {
         await storeContacts(updatedContacts);
     };
 
-    // Save cotacts in AsyncStorage, handling mistakes
+    // Save contacts to AsyncStorage
     const storeContacts = async (contactsList: IContact[]) => {
         try {
             await AsyncStorage.setItem('contacts', JSON.stringify(contactsList));
@@ -61,10 +61,13 @@ const useContacts = () => {
             console.error('Error saving contacts to storage', error);
         }
     };
-    // charge contact from the component
+
+    // Automatically load contacts when the component is focused
     useEffect(() => {
-        loadContacts();
-    }, [loadContacts, focused]);
+        if (focused) {
+            loadContacts();
+        }
+    }, [focused, loadContacts]);
 
     return {contacts, addContact, updateContact, deleteContact, loadContacts};
 };
