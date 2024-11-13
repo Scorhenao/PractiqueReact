@@ -11,9 +11,6 @@ import {
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from '../screens/AppNavigator';
-import useContacts from './hooks/useContacts';
-import IContact from './interfaces/contact.interface';
 import {Picker} from '@react-native-picker/picker';
 import {useTheme} from '../theme/themeContext';
 import colorsDarkMode from '../theme/colorsDarkMode';
@@ -24,6 +21,9 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import MapView, {Marker} from 'react-native-maps';
 import axios from 'axios';
 import Config from '../../config';
+import IContact from '../components/interfaces/contact.interface';
+import useContacts from '../components/hooks/useContacts';
+import {RootStackParamList} from './types/NavigationTypes';
 
 type EditContactScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditContact'>;
 
@@ -55,7 +55,7 @@ const EditContact: React.FC = () => {
     const fetchWeather = async (lat: number, lon: number) => {
         const apikey = Config.openWeatherMapKey;
         try {
-            const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather`, {
+            const response = await axios.get('https://api.openweathermap.org/data/2.5/weather', {
                 params: {
                     lat,
                     lon,
@@ -128,7 +128,7 @@ const EditContact: React.FC = () => {
 
                 {/* Name, Phone, Email Inputs */}
                 <View style={styles.inputContainer}>
-                    <FontAwesome name="user" size={20} color={colors.icon} style={styles.icon} />
+                    <FontAwesome name="user" size={20} style={styles.icon} />
                     <TextInput
                         placeholder={t('namePlaceholder')}
                         value={name}
@@ -140,7 +140,7 @@ const EditContact: React.FC = () => {
                     />
                 </View>
                 <View style={styles.inputContainer}>
-                    <FontAwesome name="phone" size={20} color={colors.icon} style={styles.icon} />
+                    <FontAwesome name="phone" size={20} style={styles.icon} />
                     <TextInput
                         placeholder={t('phonePlaceholder')}
                         value={phone}
@@ -152,12 +152,7 @@ const EditContact: React.FC = () => {
                     />
                 </View>
                 <View style={styles.inputContainer}>
-                    <FontAwesome
-                        name="envelope"
-                        size={20}
-                        color={colors.icon}
-                        style={styles.icon}
-                    />
+                    <FontAwesome name="envelope" size={20} />
                     <TextInput
                         placeholder={t('emailPlaceholder')}
                         value={email}

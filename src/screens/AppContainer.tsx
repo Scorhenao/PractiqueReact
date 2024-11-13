@@ -1,45 +1,60 @@
 import React, {useState} from 'react';
-import NavBar from '../components/navBar';
+import {ScrollView, RefreshControl, StyleSheet, View} from 'react-native';
 import ContactCard from '../components/ContactCard';
 import AddFloatingButton from '../components/AddFloatingButton';
-import {RefreshControl, ScrollView, StyleSheet, View} from 'react-native';
 import useContacts from '../components/hooks/useContacts';
-import {useTheme} from '../theme/themeContext'; // Import the Theme Context
+import {useTheme} from '../theme/themeContext';
 import colorsDarkMode from '../theme/colorsDarkMode';
 import colorsLightMode from '../theme/colorsLightMode';
+import LoadingAnimation from '../components/AnimatedTextComponent';
+import NavBar from '../components/navBar';
 
-const AppContainer = () => {
+const AppContainer: React.FC = () => {
     const {contacts, loadContacts, deleteContact} = useContacts();
     const [refreshing, setRefreshing] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    const {darkMode} = useTheme(); // Get darkMode from context
+    const {darkMode} = useTheme();
+    const colors = darkMode ? colorsLightMode : colorsDarkMode;
 
     const onRefresh = async () => {
         setRefreshing(true);
-        await loadContacts(); // Load the updated list of contacts
+        await loadContacts();
         setRefreshing(false);
     };
 
-    // Theme colors based on darkMode state
-    const colors = darkMode ? colorsLightMode : colorsDarkMode;
+    const handleAnimationFinish = () => {
+        // Introducing a small delay before hiding the animation and showing the content
+        setTimeout(() => {
+            setLoading(false);
+        }, 6000); // Adjust the delay if needed
+    };
 
     return (
         <View style={[styles.container, {backgroundColor: colors.background}]}>
-            <NavBar />
-            <ScrollView
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-                {contacts.map((contact, index) => (
-                    <ContactCard
-                        key={index}
-                        contact={contact} // Pass the contact object
-                        darkMode={darkMode} // Pass darkMode to ContactCard
-                        onDelete={deleteContact}
+            {loading ? (
+                <LoadingAnimation onFinished={handleAnimationFinish} />
+            ) : (
+                <>
+                    <NavBar />
+                    <ScrollView
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                        }>
+                        {contacts.map((contact, index) => (
+                            <ContactCard
+                                key={index}
+                                contact={contact}
+                                darkMode={darkMode}
+                                onDelete={deleteContact}
+                            />
+                        ))}
+                    </ScrollView>
+                    <AddFloatingButton
+                        buttonColor={darkMode ? colorsDarkMode.link : colorsLightMode.link}
                     />
-                ))}
-            </ScrollView>
-            <AddFloatingButton
-                buttonColor={darkMode ? colorsDarkMode.link : colorsLightMode.link}
-            />
+                </>
+            )}
         </View>
     );
 };

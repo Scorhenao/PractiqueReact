@@ -14,16 +14,16 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {Picker} from '@react-native-picker/picker';
 import colorsDarkMode from '../theme/colorsLightMode';
 import colorsLightMode from '../theme/colorsDarkMode';
-import useContacts from './hooks/useContacts';
 import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useTheme} from '../theme/themeContext';
 import {useTranslation} from 'react-i18next';
-import IContact from './interfaces/contact.interface';
 import {RootStackParamList} from '../screens/types/NavigationTypes';
 import Config from '../../config';
 import MapView, {Marker} from 'react-native-maps';
 import axios from 'axios';
+import IContact from '../components/interfaces/contact.interface';
+import useContacts from '../components/hooks/useContacts';
 
 type AddContactRouteProp = RouteProp<RootStackParamList, 'AddContact'>;
 
@@ -218,9 +218,7 @@ const AddContact = () => {
                             </Text>
                         </View>
                     ) : (
-                        <Text style={styles.noWeatherText}>
-                            {t('noWeather')}
-                        </Text>
+                        <Text style={styles.noWeatherText}>{t('noWeather')}</Text>
                     )}
 
                     <View style={styles.buttonContainer}>
