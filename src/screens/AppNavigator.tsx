@@ -1,20 +1,22 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import AppContainer from './AppContainer';
-import ViewContact from '../components/ViewContact';
 import SettingsScreen from './SettingsScreen';
 import {RootStackParamList} from './types/NavigationTypes';
 import EditContact from './EditContact';
 import AddContact from './AddContact';
 import LoginScreen from './Login';
 import SelectLocation from '../components/SelectLocation';
+import ViewContact from './ViewContact';
+import Register from './Register';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
     return (
         <Stack.Navigator>
-            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen options={{headerShown: false}} name="Register" component={Register} />
+            <Stack.Screen  name="Login" component={LoginScreen} />
             <Stack.Screen
                 options={{headerShown: false}}
                 name="AppContainer"

@@ -9,6 +9,7 @@ export type RootStackParamList = {
     SelectLocation: {onLocationSelected: (loc: {latitude: string; longitude: string}) => void}; // Agregar SelectLocation con sus parámetros
     SettingsScreen: undefined;
     Login: undefined;
+    Register: undefined;
 };
 
 export type EditContactScreenNavigationProp = StackNavigationProp<

@@ -16,7 +16,7 @@ const LoginScreen = () => {
     const {t} = useTranslation();
     const navigation = useNavigation();
     const {darkMode} = useTheme();
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
@@ -45,7 +45,7 @@ const LoginScreen = () => {
         backgroundColor: backgroundColor.value,
     }));
 
-    const handleRegister = () => {
+    const handleLogin = () => {
         // Trigger a flash effect on submission
         backgroundColor.value = withTiming(
             colors.link,
@@ -62,28 +62,31 @@ const LoginScreen = () => {
     return (
         <Animated.View style={[styles.container, animatedContainerStyle]}>
             <Animated.Text style={[styles.title, animatedTitleStyle, {color: colors.text}]}>
-                {t('Sign-in to CloseToYou')}
+                {t('Sign-up to CloseToYou')}
             </Animated.Text>
 
             <Animated.View style={animatedInputStyle}>
                 <TextInput
                     style={[styles.input, {color: colors.text, borderColor: colors.text}]}
-                    placeholder={t('namePlaceholder')}
+                    placeholder={t('emailPlaceholder')}
                     placeholderTextColor={colors.placeholder}
-                    value={username}
-                    onChangeText={setUsername}
+                    secureTextEntry
+                    value={email}
+                    onChangeText={setEmail}
+                    textContentType="emailAddress"
                 />
                 <TextInput
                     style={[styles.input, {color: colors.text, borderColor: colors.text}]}
-                    placeholder={t('emailPlaceholder')}
+                    placeholder={t('passwordPlaceholder')}
                     placeholderTextColor={colors.placeholder}
                     secureTextEntry
                     value={password}
                     onChangeText={setPassword}
+                    textContentType="password"
                 />
             </Animated.View>
 
-            <Button title={t('save')} onPress={handleRegister} color={colors.link} />
+            <Button title={t('save')} onPress={handleLogin} color={colors.link} />
         </Animated.View>
     );
 };
