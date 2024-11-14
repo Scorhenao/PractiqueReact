@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import {ScrollView, RefreshControl, StyleSheet, View} from 'react-native';
+import {StyleSheet, View, RefreshControl} from 'react-native';
+import Animated, {LinearTransition} from 'react-native-reanimated';
 import ContactCard from '../components/ContactCard';
 import AddFloatingButton from '../components/AddFloatingButton';
 import useContacts from '../components/hooks/useContacts';
@@ -8,12 +9,12 @@ import colorsDarkMode from '../theme/colorsDarkMode';
 import colorsLightMode from '../theme/colorsLightMode';
 import LoadingAnimation from '../components/AnimatedTextComponent';
 import NavBar from '../components/navBar';
+import IContact from '../components/interfaces/contact.interface';
 
 const AppContainer: React.FC = () => {
     const {contacts, loadContacts, deleteContact} = useContacts();
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(true);
-
     const {darkMode} = useTheme();
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
 
@@ -24,11 +25,14 @@ const AppContainer: React.FC = () => {
     };
 
     const handleAnimationFinish = () => {
-        // Introducing a small delay before hiding the animation and showing the content
         setTimeout(() => {
             setLoading(false);
-        }, 6000); // Adjust the delay if needed
+        }, 6000);
     };
+
+    const renderContactCard = ({item}: {item: IContact}) => (
+        <ContactCard contact={item} darkMode={darkMode} onDelete={deleteContact} />
+    );
 
     return (
         <View style={[styles.container, {backgroundColor: colors.background}]}>
@@ -37,19 +41,15 @@ const AppContainer: React.FC = () => {
             ) : (
                 <>
                     <NavBar />
-                    <ScrollView
+                    <Animated.FlatList
+                        data={contacts}
+                        renderItem={renderContactCard}
+                        keyExtractor={item => item.id.toString()}
                         refreshControl={
                             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                        }>
-                        {contacts.map((contact, index) => (
-                            <ContactCard
-                                key={index}
-                                contact={contact}
-                                darkMode={darkMode}
-                                onDelete={deleteContact}
-                            />
-                        ))}
-                    </ScrollView>
+                        }
+                        itemLayoutAnimation={LinearTransition}
+                    />
                     <AddFloatingButton
                         buttonColor={darkMode ? colorsDarkMode.link : colorsLightMode.link}
                     />

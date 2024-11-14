@@ -7,6 +7,7 @@ import {RootStackParamList} from './types/NavigationTypes';
 import EditContact from './EditContact';
 import AddContact from './AddContact';
 import LoginScreen from './Login';
+import SelectLocation from '../components/SelectLocation';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -23,6 +24,7 @@ export default function AppNavigator() {
             <Stack.Screen name="EditContact" component={EditContact} />
             <Stack.Screen name="ViewContact" component={ViewContact} />
             <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+            <Stack.Screen name="SelectLocation" component={SelectLocation} />
         </Stack.Navigator>
     );
 }

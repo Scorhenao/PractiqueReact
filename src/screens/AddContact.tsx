@@ -1,14 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {
-    View,
-    TextInput,
-    TouchableOpacity,
-    Image,
-    StyleSheet,
-    Alert,
-    Text,
-    ScrollView,
-} from 'react-native';
+import {View, TextInput, TouchableOpacity, Image, Alert, Text, ScrollView} from 'react-native';
 import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {Picker} from '@react-native-picker/picker';
@@ -24,7 +15,15 @@ import MapView, {Marker} from 'react-native-maps';
 import axios from 'axios';
 import IContact from '../components/interfaces/contact.interface';
 import useContacts from '../components/hooks/useContacts';
-
+import Animated, {
+    SlideInDown,
+    SlideInLeft,
+    SlideInRight,
+    SlideOutLeft,
+    SlideOutRight,
+    SlideOutUp,
+} from 'react-native-reanimated';
+import styles from './styles/AddContact.styles';
 type AddContactRouteProp = RouteProp<RootStackParamList, 'AddContact'>;
 
 const AddContact = () => {
@@ -46,6 +45,7 @@ const AddContact = () => {
     const {darkMode} = useTheme();
     const colors = darkMode ? colorsDarkMode : colorsLightMode;
     const [weather, setWeather] = useState<any>(null);
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false); // State for success message
 
     const apiKey = Config.openWeatherMapKey;
 
@@ -74,7 +74,7 @@ const AddContact = () => {
 
     const handleSave = () => {
         if (!name || !phone) {
-            Alert.alert(t('errorMessage'), t('fillRequiredFields'));
+            Alert.alert(t('errorMessage'));
             return;
         }
 
@@ -89,8 +89,11 @@ const AddContact = () => {
         };
 
         addContact(newContact);
-        Alert.alert(t('successMessage'));
-        navigation.goBack();
+        setShowSuccessMessage(true); // Mostrar mensaje de éxito
+        setTimeout(() => {
+            setShowSuccessMessage(false); // Ocultar mensaje después de 2 segundos
+            navigation.goBack(); // Navegar de regreso después de mostrar el mensaje
+        }, 2000);
     };
 
     const handleLocationSelect = () => {
@@ -113,7 +116,7 @@ const AddContact = () => {
 
             fetchWeather();
         }
-    }, [location]);
+    }, [apiKey, location]);
 
     // Determine icon based on weather
     const getWeatherIcon = () => {
@@ -134,6 +137,9 @@ const AddContact = () => {
         if (mainWeather === 'snow') {
             return 'snowflake'; // Handles snow
         }
+        if (mainWeather === 'drizzle' || mainWeather === 'mist' || mainWeather === 'haze') {
+            return 'cloud-drizzle'; // Handles drizzle, mist, and haze
+        }
         return 'cloud'; // Default fallback
     };
 
@@ -148,33 +154,43 @@ const AddContact = () => {
                             <Text style={styles.noImageSelected}>{t('NoImageSelected')}</Text>
                         )}
                     </View>
-                    <TextInput
-                        placeholder={t('namePlaceholder')}
-                        placeholderTextColor={colors.placeholder}
-                        style={[
-                            styles.input,
-                            {backgroundColor: colors.inputBackground, color: colors.text},
-                        ]}
-                        onChangeText={setName}
-                    />
-                    <TextInput
-                        placeholder={t('phonePlaceholder')}
-                        placeholderTextColor={colors.placeholder}
-                        style={[
-                            styles.input,
-                            {backgroundColor: colors.inputBackground, color: colors.text},
-                        ]}
-                        onChangeText={setPhone}
-                    />
-                    <TextInput
-                        placeholder={t('emailPlaceholder')}
-                        placeholderTextColor={colors.placeholder}
-                        style={[
-                            styles.input,
-                            {backgroundColor: colors.inputBackground, color: colors.text},
-                        ]}
-                        onChangeText={setEmail}
-                    />
+                    {/* Animated input fields */}
+                    <Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
+                        <TextInput
+                            placeholder={t('namePlaceholder')}
+                            placeholderTextColor={colors.placeholder}
+                            style={[
+                                styles.input,
+                                {backgroundColor: colors.inputBackground, color: colors.text},
+                            ]}
+                            onChangeText={setName}
+                        />
+                    </Animated.View>
+
+                    <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
+                        <TextInput
+                            placeholder={t('phonePlaceholder')}
+                            placeholderTextColor={colors.placeholder}
+                            style={[
+                                styles.input,
+                                {backgroundColor: colors.inputBackground, color: colors.text},
+                            ]}
+                            onChangeText={setPhone}
+                        />
+                    </Animated.View>
+
+                    <Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
+                        <TextInput
+                            placeholder={t('emailPlaceholder')}
+                            placeholderTextColor={colors.placeholder}
+                            style={[
+                                styles.input,
+                                {backgroundColor: colors.inputBackground, color: colors.text},
+                            ]}
+                            onChangeText={setEmail}
+                        />
+                    </Animated.View>
+
                     <Picker
                         selectedValue={contactType}
                         style={{color: colors.text, backgroundColor: colors.inputBackground}}
@@ -239,6 +255,15 @@ const AddContact = () => {
                             </Text>
                         </TouchableOpacity>
                     </View>
+                    {/* Display success message */}
+                    {showSuccessMessage && (
+                        <Animated.View
+                            entering={SlideInDown}
+                            exiting={SlideOutUp}
+                            style={styles.successMessage}>
+                            <Text style={styles.successText}>{t('successMessage')}</Text>
+                        </Animated.View>
+                    )}
                     <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
                         <FontAwesome name="save" size={20} color="#fff" />
                         <Text style={styles.saveButtonText}>{t('save')}</Text>
@@ -248,91 +273,5 @@ const AddContact = () => {
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-    },
-    input: {
-        height: 40,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        marginBottom: 20,
-        paddingHorizontal: 10,
-    },
-    imageContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 20,
-    },
-    image: {
-        marginTop: 20,
-        width: 150,
-        height: 150,
-        borderRadius: 100,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 20,
-    },
-    button: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 10,
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: 'black',
-        marginTop: 20,
-    },
-    buttonText: {
-        marginLeft: 10,
-    },
-    saveButton: {
-        backgroundColor: '#007BFF',
-        padding: 15,
-        borderRadius: 5,
-        alignItems: 'center',
-        flexDirection: 'row',
-        justifyContent: 'center',
-    },
-    saveButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        marginLeft: 5,
-    },
-    noImageSelected: {
-        color: '#fc0804',
-        marginTop: 6,
-        marginBottom: 6,
-        textAlign: 'center',
-    },
-    mapContainer: {
-        height: 250, // Adjust size as needed
-        marginVertical: 20,
-    },
-    map: {
-        flex: 1,
-        borderRadius: 10,
-    },
-    locationText: {
-        color: '#555',
-        textAlign: 'center',
-        marginTop: 10,
-    },
-    weatherContainer: {
-        marginTop: 20,
-    },
-    weatherText: {
-        fontSize: 18,
-        marginBottom: 5,
-    },
-    noWeatherText: {
-        fontSize: 16,
-        color: 'gray',
-    },
-});
 
 export default AddContact;
