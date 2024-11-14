@@ -62,7 +62,7 @@ const LoginScreen = () => {
     return (
         <Animated.View style={[styles.container, animatedContainerStyle]}>
             <Animated.Text style={[styles.title, animatedTitleStyle, {color: colors.text}]}>
-                {t('Sign-up to CloseToYou')}
+                {t('Sign-in to CloseToYou')}
             </Animated.Text>
 
             <Animated.View style={animatedInputStyle}>

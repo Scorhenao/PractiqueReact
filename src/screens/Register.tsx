@@ -56,7 +56,7 @@ const RegisterScreen = () => {
     return (
         <Animated.View style={[styles.container, animatedContainerStyle]}>
             <Animated.Text style={[styles.title, animatedTitleStyle, {color: colors.text}]}>
-                {t('Sign-in to CloseToYou')}
+                {t('Sign-up to CloseToYou')}
             </Animated.Text>
             <TextInput
                 style={[styles.input, {color: colors.text, borderColor: colors.text}]}
