@@ -1,6 +1,13 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import {
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    Alert,
+    ActivityIndicator,
+} from 'react-native';
 import {useTheme} from '../theme/themeContext';
 import colorsLightMode from '../theme/colorsLightMode';
 import colorsDarkMode from '../theme/colorsDarkMode';
@@ -13,7 +20,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from './types/NavigationTypes';
-import { useRegister } from '../hooks/useRegister';
+import {useRegister} from '../hooks/useRegister';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -22,7 +29,7 @@ const RegisterScreen = () => {
     const navigation: NavigationProp = useNavigation();
     const {darkMode} = useTheme();
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
-    const [username, setUsername] = useState('');
+    const [name, setname] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const {register, loading} = useRegister();
@@ -48,12 +55,19 @@ const RegisterScreen = () => {
     }));
 
     const handleRegister = async () => {
-        if (!username || !email || !password) {
+        if (!name || !email || !password) {
             Alert.alert('Error', t('Please fill all fields'));
             return;
         }
 
-        const result = await register(username, email, password);
+        const data = {
+            name: name,
+            email: email,
+            password: password,
+        };
+
+        // Now pass all four arguments to the register function
+        const result = await register(data);
 
         if (result.success) {
             navigation.navigate('Login'); // Navigate to Login after successful registration
@@ -69,8 +83,8 @@ const RegisterScreen = () => {
                 style={[styles.input, {color: colors.text, borderColor: colors.text}]}
                 placeholder={t('namePlaceholder')}
                 placeholderTextColor={colors.placeholder}
-                value={username}
-                onChangeText={setUsername}
+                value={name}
+                onChangeText={setname}
                 textContentType="name"
             />
             <TextInput

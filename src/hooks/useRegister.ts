@@ -1,52 +1,49 @@
+import {RegisterResponse} from './../interfaces/register/RegisterResponse.interface';
 import {useState} from 'react';
 import {notify} from '../components/NotificationManager';
 import {BaseUrl, RegisterUrl} from '../utils/routhes';
+import axios from 'axios';
+import {RegisterBodyRequest} from '../interfaces/register/RegisterBodyRequest.interface';
+import {RegisterErrorResponse} from '../interfaces/register/RegisterErrorResponse.interface';
+import {handleRegisterError} from '../utils/errors/RegisterErrors';
 
 export const useRegister = () => {
     const [loading, setLoading] = useState(false);
 
-    const register = async (username: string, email: string, password: string) => {
-        const requestBody = {
-            email,
-            password,
-            name: username,
-        };
-
+    const register = async (
+        requestBody: RegisterBodyRequest,
+    ): Promise<RegisterResponse | RegisterErrorResponse> => {
         try {
             setLoading(true);
-            const response = await fetch(`${BaseUrl}${RegisterUrl}`, {
-                method: 'POST',
+
+            // Make the POST request using Axios
+            const response = await axios.post(`${BaseUrl}${RegisterUrl}`, requestBody, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(requestBody),
             });
 
-            const data = await response.json();
-
-            if (response.status === 500){
-                notify('danger', 'Server error', 'Please try again later.');
-            }
-
-            if (response.ok) {
+            if (response.status === 201 || response.status === 200) {
                 notify('success', 'Registration Successful!', 'You have successfully registered.');
-                return {success: true, data: data.data};
+                return {success: true, data: response.data};
             } else {
-                const message = Array.isArray(data.message)
-                    ? data.message.join(', ')
-                    : data.message;
+                const message = Array.isArray(response.data.message)
+                    ? response.data.message.join(', ')
+                    : response.data.message;
                 notify('danger', 'Registration Failed', message || 'Something went wrong.');
                 return {success: false, message};
             }
         } catch (error) {
-            console.error(error);
-            notify('danger', 'Network Error', 'Something went wrong. Please try again.');
-            return {success: false, message: 'Network error'};
+            if (axios.isAxiosError(error)) {
+                console.error('Axios error:', error.response?.data); // Log the response data
+                console.error('Axios error status:', error.response?.status); // Log the status code
+                console.error('Axios error headers:', error.response?.headers); // Log the response headers
+            }
+            return handleRegisterError(error);
         } finally {
-            setLoading(false);
+            setLoading(false); // Set loading to false when the request finishes
         }
     };
 
     return {register, loading};
 };
-

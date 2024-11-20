@@ -117,9 +117,7 @@ const OnboardingScreen = () => {
                 {
                     backgroundColor: colors.background,
                     image: (
-                        <Image
-                            source={require('../assets/imgs/tutorial/step-6-navDropdown.png')}
-                        />
+                        <Image source={require('../assets/imgs/tutorial/step-6-navDropdown.png')} />
                     ),
                     title: 'Dropdown Options',
                     subtitle:
@@ -128,9 +126,7 @@ const OnboardingScreen = () => {
                 {
                     backgroundColor: colors.background,
                     image: (
-                        <Image
-                            source={require('../assets/imgs/tutorial/step-7-navDropdown.png')}
-                        />
+                        <Image source={require('../assets/imgs/tutorial/step-7-navDropdown.png')} />
                     ),
                     title: 'Theme Toggle',
                     subtitle:
@@ -139,9 +135,7 @@ const OnboardingScreen = () => {
                 {
                     backgroundColor: colors.background,
                     image: (
-                        <Image
-                            source={require('../assets/imgs/tutorial/step-8-navDropdown.png')}
-                        />
+                        <Image source={require('../assets/imgs/tutorial/step-8-navDropdown.png')} />
                     ),
                     title: 'Language Selection',
                     subtitle:
