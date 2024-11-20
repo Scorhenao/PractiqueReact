@@ -16,7 +16,6 @@ export const useRegister = () => {
         try {
             setLoading(true);
 
-            // Make the POST request using Axios
             const response = await axios.post(`${BaseUrl}${RegisterUrl}`, requestBody, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -35,13 +34,13 @@ export const useRegister = () => {
             }
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                console.error('Axios error:', error.response?.data); // Log the response data
-                console.error('Axios error status:', error.response?.status); // Log the status code
-                console.error('Axios error headers:', error.response?.headers); // Log the response headers
+                console.error('Axios error:', error.response?.data);
+                console.error('Axios error status:', error.response?.status);
+                console.error('Axios error headers:', error.response?.headers);
             }
             return handleRegisterError(error);
         } finally {
-            setLoading(false); // Set loading to false when the request finishes
+            setLoading(false);
         }
     };
 
