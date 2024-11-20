@@ -8,16 +8,25 @@ import AddContact from './AddContact';
 import LoginScreen from './Login';
 import SelectLocation from '../components/SelectLocation';
 import ViewContact from './ViewContact';
-import Register from './Register';
 import OnboardingScreen from './OnboardingScreen';
-
+import RegisterScreen from './RegisterScreen';
+import HomeScreen from './HomeScreen';
 const Stack = createStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
     return (
-        <Stack.Navigator>
-            <Stack.Screen options={{headerShown: false}} name="OnboardingScreen" component={OnboardingScreen} />
-            <Stack.Screen options={{headerShown: false}} name="Register" component={Register} />
+        <Stack.Navigator initialRouteName="OnboardingScreen">
+            <Stack.Screen
+                options={{headerShown: false}}
+                name="OnboardingScreen"
+                component={OnboardingScreen}
+            />
+            <Stack.Screen options={{headerShown: false}} name="HomeScreen" component={HomeScreen} />
+            <Stack.Screen
+                options={{headerShown: false}}
+                name="Register"
+                component={RegisterScreen}
+            />
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen
                 options={{headerShown: false}}

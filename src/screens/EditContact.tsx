@@ -21,7 +21,7 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import MapView, {Marker} from 'react-native-maps';
 import axios from 'axios';
 import Config from '../../config';
-import IContact from '../components/interfaces/contact.interface';
+import IContact from '../interfaces/contact.interface';
 import useContacts from '../components/hooks/useContacts';
 import {RootStackParamList} from './types/NavigationTypes';
 

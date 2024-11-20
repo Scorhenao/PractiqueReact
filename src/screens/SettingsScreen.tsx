@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {View, Text, Button, StyleSheet, ActivityIndicator, Alert} from 'react-native';
 import ContactCard from '../components/ContactCard';
-import {syncContacts} from '../services/contactsService'; // Import the sync service
+import {syncContacts} from '../services/syncContactsService'; // Import the sync service
 import {useNavigation} from '@react-navigation/native'; // For navigation
 
 interface Contact {

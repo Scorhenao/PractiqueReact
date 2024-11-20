@@ -1,7 +1,8 @@
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import IContact from '../../components/interfaces/contact.interface';
+import IContact from '../../interfaces/contact.interface';
 export type RootStackParamList = {
+    HomeScreen: undefined;
     AppContainer: undefined;
     AddContact: undefined;
     EditContact: {contact: IContact};

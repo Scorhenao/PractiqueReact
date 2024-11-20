@@ -5,7 +5,7 @@ import {useNavigation} from '@react-navigation/native';
 import colorsDarkMode from '../theme/colorsLightMode';
 import colorsLightMode from '../theme/colorsDarkMode';
 import {EditContactScreenNavigationProp} from '../screens/types/NavigationTypes';
-import IContact from './interfaces/contact.interface';
+import IContact from '../interfaces/contact.interface';
 import i18n from '../i18n';
 
 interface ContactCardProps {

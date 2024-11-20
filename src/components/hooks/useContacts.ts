@@ -1,6 +1,6 @@
 import {useState, useEffect, useCallback} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import IContact from '../interfaces/contact.interface';
+import IContact from '../../interfaces/contact.interface';
 import {useIsFocused} from '@react-navigation/native';
 
 const useContacts = () => {

@@ -13,7 +13,7 @@ import {RootStackParamList} from '../screens/types/NavigationTypes';
 import Config from '../../config';
 import MapView, {Marker} from 'react-native-maps';
 import axios from 'axios';
-import IContact from '../components/interfaces/contact.interface';
+import IContact from '../interfaces/contact.interface';
 import useContacts from '../components/hooks/useContacts';
 import Animated, {
     SlideInDown,

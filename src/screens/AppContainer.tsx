@@ -9,7 +9,7 @@ import colorsDarkMode from '../theme/colorsDarkMode';
 import colorsLightMode from '../theme/colorsLightMode';
 import LoadingAnimation from '../components/AnimatedTextComponent';
 import NavBar from '../components/navBar';
-import IContact from '../components/interfaces/contact.interface';
+import IContact from '../interfaces/contact.interface';
 
 const AppContainer: React.FC = () => {
     const {contacts, loadContacts, deleteContact} = useContacts();
