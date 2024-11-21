@@ -11,10 +11,14 @@ import {useNavigation} from '@react-navigation/native';
 import {useTheme} from '../theme/themeContext';
 import colorsDarkMode from '../theme/colorsDarkMode';
 import colorsLightMode from '../theme/colorsLightMode';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from './types/NavigationTypes';
+
+type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const LoginScreen = () => {
     const {t} = useTranslation();
-    const navigation = useNavigation();
+    const navigation:NavigationProp = useNavigation();
     const {darkMode} = useTheme();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
