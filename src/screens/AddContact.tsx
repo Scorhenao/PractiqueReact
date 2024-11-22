@@ -12,7 +12,6 @@ import {RootStackParamList} from '../screens/types/NavigationTypes';
 import Config from '../../config';
 import MapView, {Marker} from 'react-native-maps';
 import axios from 'axios';
-import IContact from '../interfaces/contact.interface';
 import Animated, {
     SlideInLeft,
     SlideInRight,

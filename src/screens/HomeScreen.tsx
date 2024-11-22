@@ -24,7 +24,7 @@ const HomeScreen = ({navigation}: any) => {
                 <TouchableOpacity
                     style={[styles.button, {backgroundColor: colors.link}]}
                     onPress={() => navigation.navigate('Register')}>
-                    <Text style={styles.buttonText}>Register</Text>
+                    <Text style={[styles.buttonText, {color: colors.text}]}>Register</Text>
                 </TouchableOpacity>
             </View>
         </View>

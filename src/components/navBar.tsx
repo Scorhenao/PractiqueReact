@@ -3,12 +3,12 @@ import {View, Text, TouchableOpacity, StyleSheet, TouchableWithoutFeedback} from
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {Dropdown} from 'react-native-element-dropdown';
 import {SearchBar} from 'react-native-elements';
-import i18n from '../i18n'; // Importando la configuración de i18n
-import colorsDarkMode from '../theme/colorsLightMode';
-import colorsLightMode from '../theme/colorsDarkMode';
-import {useTheme} from '../context/themeContext'; // Importa el Theme Context
-import {useNavigation} from '@react-navigation/native'; // Para la navegación
-import DarkModeToggle from './DarkModeToggle'; // Importa el nuevo componente
+import i18n from '../i18n';
+import colorsDarkMode from '../theme/colorsDarkMode';
+import colorsLightMode from '../theme/colorsLightMode';
+import {useTheme} from '../context/themeContext';
+import {useNavigation} from '@react-navigation/native';
+import DarkModeToggle from './DarkModeToggle';
 import {RootStackParamList} from '../screens/types/NavigationTypes';
 import {StackNavigationProp} from '@react-navigation/stack';
 
@@ -19,28 +19,22 @@ const NavBar = () => {
     const navigation: NavigationProp = useNavigation();
     const [showSearch, setShowSearch] = useState(false);
     const [search, setSearch] = useState('');
-    const [language, setLanguage] = useState('US'); // Predeterminado a inglés ('US')
+    const [language, setLanguage] = useState('US');
+    const {darkMode, toggleDarkMode} = useTheme();
+    const colors = darkMode ? colorsLightMode : colorsDarkMode;
 
-    const {darkMode, setDarkMode} = useTheme(); // Obtén el estado de darkMode
-
-    // Colores según el estado de darkMode
-    const colors = darkMode ? colorsDarkMode : colorsLightMode;
-
-    // Función para cambiar el idioma
     const changeLanguage = (lang: string) => {
         setLanguage(lang);
-        i18n.changeLanguage(lang === 'US' ? 'en' : 'es'); // Cambia el idioma en i18n
+        i18n.changeLanguage(lang === 'US' ? 'en' : 'es');
     };
 
-    // Datos para el dropdown
     const data = [
-        {label: 'ES', value: 'ES'}, // Español
-        {label: 'US', value: 'US'}, // Inglés
+        {label: 'ES', value: 'ES'},
+        {label: 'US', value: 'US'},
     ];
 
-    // Función para cerrar el dropdown al hacer click fuera de él
     const handleCloseMenu = () => {
-        setShowMenu(false); // Cerrar el dropdown
+        setShowMenu(false);
     };
 
     return (
@@ -58,14 +52,11 @@ const NavBar = () => {
                                 {backgroundColor: colors.secondaryBackground},
                             ]}>
                             {/* Dark Mode Toggle */}
-                            <DarkModeToggle onPress={() => setDarkMode(!darkMode)} />
+                            <DarkModeToggle onPress={toggleDarkMode} />
 
                             {/* Language Selector */}
                             <Dropdown
-                                style={[
-                                    styles.dropdown,
-                                    {backgroundColor: colors.secondaryBackground},
-                                ]}
+                                style={[styles.dropdown]}
                                 data={data}
                                 labelField="label"
                                 valueField="value"
@@ -74,7 +65,7 @@ const NavBar = () => {
                                 placeholder={i18n.t('selectLanguage')}
                                 containerStyle={[
                                     styles.dropdownContainerStyle,
-                                    {backgroundColor: colors.secondaryBackground},
+                                    {backgroundColor: colors.background, borderColor: colors.text},
                                 ]}
                             />
 
@@ -103,8 +94,8 @@ const NavBar = () => {
                 <View style={styles.center}>
                     {showSearch ? (
                         <SearchBar
-                            placeholder="Type Here..."
-                            onChangeText={text => setSearch(text)} // Directly use the string `text`
+                            placeholder={i18n.t('searchPlaceholder')}
+                            onChangeText={setSearch}
                             value={search}
                             containerStyle={[
                                 styles.searchContainer,
@@ -178,8 +169,6 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         marginBottom: 15,
     },
-    placeholderStyle: {},
-    selectedTextStyle: {},
     dropdownContainerStyle: {},
     center: {
         alignItems: 'center',

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {TextInput, Button, StyleSheet, Alert} from 'react-native';
+import {TextInput, Button, StyleSheet} from 'react-native';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -15,6 +15,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from './types/NavigationTypes';
 import authService from '../services/authService'; // Import authService
 import axios from 'axios'; // Axios for making API requests
+import {notify} from '../components/NotificationManager';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -78,11 +79,11 @@ const LoginScreen = () => {
                 // Navigate to the main screen
                 navigation.navigate('AppContainer');
             } else {
-                Alert.alert(t('error'), t('invalidCredentials'));
+                notify('danger', 'error', 'invalid credentials');
             }
         } catch (error) {
             console.error('Login failed:', error);
-            Alert.alert(t('error'), t('loginFailed'));
+            notify('warning', 'error', 'Login failed');
         }
     };
 

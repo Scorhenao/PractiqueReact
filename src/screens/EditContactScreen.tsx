@@ -1,14 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {
-    View,
-    TextInput,
-    Alert,
-    StyleSheet,
-    TouchableOpacity,
-    Text,
-    Image,
-    ScrollView,
-} from 'react-native';
+import {View, TextInput, StyleSheet, TouchableOpacity, Text, Image, ScrollView} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Picker} from '@react-native-picker/picker';
@@ -24,6 +15,7 @@ import Config from '../../config';
 import IContact from '../interfaces/contact.interface';
 import useContacts from '../hooks/useContacts';
 import {RootStackParamList} from './types/NavigationTypes';
+import {notify} from '../components/NotificationManager';
 
 type EditContactScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditContact'>;
 
@@ -82,14 +74,15 @@ const EditContact: React.FC = () => {
             if (uri) {
                 setImage(uri);
             } else {
-                Alert.alert(t('error'), t('failedToGetImageUri'));
+                notify('danger', 'Error', 'Failed to get image URI.');
             }
         } else {
-            Alert.alert(t('error'), t('failedToPickImage'));
+            notify('danger', 'Error', 'Failed to pick an image.');
         }
     };
 
     const handleSave = async () => {
+        // Prepare the updated contact data
         const updatedContact: IContact = {
             ...contact,
             name: name || contact.name,
@@ -97,23 +90,34 @@ const EditContact: React.FC = () => {
             email: email || contact.email,
             image: image || contact.image,
             isEmployee: contactType === 'Employee',
-            location: location, // Save location
+            location: location,
+            profilePicture: image || contact.image, // Ensure to update the profile picture
+            latitude: location.latitude,
+            longitude: location.longitude, // Location coordinates
         };
 
-        await updateContact(updatedContact);
-        await loadContacts();
+        try {
+            // Call the updateContact function, which will make the PATCH request
+            await updateContact(updatedContact);
+            await loadContacts(); // Reload the contacts after the update
 
-        Alert.alert(t('success'), t('contactUpdated'), [
-            {
-                text: t('ok'),
-                onPress: () => navigation.navigate('AppContainer'),
-            },
-        ]);
+            // Notify the user about the successful update
+            notify('success', t('success'), t('contact Updated Successfully'));
+
+            // Navigate back to the AppContainer screen
+            navigation.navigate('AppContainer');
+        } catch (error) {
+            // Notify the user about the error
+            notify('danger', t('error'), t('failed To Update Contact'));
+            console.error('Error updating contact:', error);
+        }
     };
 
     return (
         <View style={[styles.container, {backgroundColor: colors.background}]}>
-            <ScrollView>
+            <ScrollView
+                contentContainerStyle={styles.scrollContainer}
+                showsVerticalScrollIndicator={false}>
                 {/* Contact Image */}
                 <TouchableOpacity onPress={handleImagePick} style={styles.imageContainer}>
                     {image ? (
@@ -209,7 +213,7 @@ const EditContact: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
+        padding: 10,
     },
     imageContainer: {
         alignItems: 'center',
@@ -276,6 +280,9 @@ const styles = StyleSheet.create({
     },
     weatherText: {
         color: '#fff',
+    },
+    scrollContainer: {
+        overflow: 'hidden',
     },
 });
 
