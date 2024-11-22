@@ -8,4 +8,6 @@ interface IContact {
     location: {latitude: number; longitude: number} | null; // Added location
 }
 
+
+
 export default IContact;

@@ -7,23 +7,22 @@ import colorsDarkMode from '../theme/colorsLightMode';
 import colorsLightMode from '../theme/colorsDarkMode';
 import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {useTheme} from '../theme/themeContext';
 import {useTranslation} from 'react-i18next';
 import {RootStackParamList} from '../screens/types/NavigationTypes';
 import Config from '../../config';
 import MapView, {Marker} from 'react-native-maps';
 import axios from 'axios';
 import IContact from '../interfaces/contact.interface';
-import useContacts from '../components/hooks/useContacts';
 import Animated, {
-    SlideInDown,
     SlideInLeft,
     SlideInRight,
     SlideOutLeft,
     SlideOutRight,
-    SlideOutUp,
 } from 'react-native-reanimated';
 import styles from './styles/AddContact.styles';
+import useContacts from '../hooks/useContacts';
+import {useTheme} from '../context/themeContext';
+
 type AddContactRouteProp = RouteProp<RootStackParamList, 'AddContact'>;
 
 const AddContact = () => {
@@ -39,8 +38,7 @@ const AddContact = () => {
     const [location, setLocation] = useState<{latitude: number; longitude: number} | null>(
         initialLocation,
     );
-
-    const {addContact} = useContacts();
+    const {addContact} = useContacts(); // Hook to handle adding contacts
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const {darkMode} = useTheme();
     const colors = darkMode ? colorsDarkMode : colorsLightMode;
@@ -78,21 +76,22 @@ const AddContact = () => {
             return;
         }
 
-        const newContact: IContact = {
-            id: Date.now(),
+        const newContact: any = {
             name,
-            phone,
             email,
+            phone,
             image: imageUri,
-            isEmployee: contactType === 'Employee',
-            location,
+            contactType: 'Employee',
+            logitud: location?.longitude,
+            latitud: location?.latitude,
+            profilePicture: imageUri,
         };
 
-        addContact(newContact);
-        setShowSuccessMessage(true); // Mostrar mensaje de éxito
+        addContact(newContact, imageUri); // Pass imageUri for uploading
+        setShowSuccessMessage(true); // Show success message
         setTimeout(() => {
-            setShowSuccessMessage(false); // Ocultar mensaje después de 2 segundos
-            navigation.goBack(); // Navegar de regreso después de mostrar el mensaje
+            setShowSuccessMessage(false); // Hide message after 2 seconds
+            navigation.goBack(); // Go back after success
         }, 2000);
     };
 
@@ -255,18 +254,20 @@ const AddContact = () => {
                             </Text>
                         </TouchableOpacity>
                     </View>
-                    {/* Display success message */}
+
+                    {/* Success message */}
                     {showSuccessMessage && (
-                        <Animated.View
-                            entering={SlideInDown}
-                            exiting={SlideOutUp}
-                            style={styles.successMessage}>
-                            <Text style={styles.successText}>{t('successMessage')}</Text>
-                        </Animated.View>
+                        <View style={styles.successMessage}>
+                            <Text style={styles.successMessage}>{t('contactAdded')}</Text>
+                        </View>
                     )}
-                    <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-                        <FontAwesome name="save" size={20} color="#fff" />
-                        <Text style={styles.saveButtonText}>{t('save')}</Text>
+
+                    <TouchableOpacity
+                        onPress={handleSave}
+                        style={[styles.saveButton, {backgroundColor: colors.primary}]}>
+                        <Text style={[styles.buttonText, {color: colors.text}]}>
+                            {t('saveContact')}
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>

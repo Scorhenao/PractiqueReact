@@ -1,7 +1,7 @@
 import {AxiosError} from 'axios';
 import {notify} from '../../components/NotificationManager';
-import {RegisterErrorResponse} from './../../interfaces/register/RegisterErrorResponse.interface';
-import {RegisterErrorData} from './../../interfaces/register/RegisterErrorData';
+import {RegisterErrorResponse} from '../../interfaces/contacts/register/RegisterErrorResponse.interface';
+import {RegisterErrorData} from '../../interfaces/contacts/register/RegisterErrorData';
 
 export const handleRegisterError = (error: unknown): RegisterErrorResponse => {
     const axiosError = error as AxiosError;

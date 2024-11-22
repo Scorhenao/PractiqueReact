@@ -12,6 +12,8 @@ export type RootStackParamList = {
     Login: undefined;
     Register: undefined;
     OnboardingScreen: {};
+    LoadingScreen: undefined;
+    HelpScreen: undefined;
 };
 
 export type EditContactScreenNavigationProp = StackNavigationProp<

@@ -7,7 +7,7 @@ import Animated, {
     withDelay,
     runOnJS,
 } from 'react-native-reanimated';
-import { useTheme } from '../theme/themeContext';
+import {useTheme} from '../context/themeContext';
 import colorsLightMode from '../theme/colorsLightMode';
 import colorsDarkMode from '../theme/colorsDarkMode';
 
@@ -26,7 +26,6 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({onFinished}) => {
 
     const {darkMode} = useTheme();
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
-
 
     useEffect(() => {
         // Modify the delay to control when each element fades in
@@ -48,7 +47,9 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({onFinished}) => {
         <View style={styles.container}>
             <Animated.Text style={[styles.text, animatedStyle1]}>{text[0]}</Animated.Text>
             <Animated.Text style={[styles.text, animatedStyle2]}>{text[1]}</Animated.Text>
-            <Animated.Text style={[styles.text, animatedStyle3, {color: colors.link}]}>{text[2]}</Animated.Text>
+            <Animated.Text style={[styles.text, animatedStyle3, {color: colors.link}]}>
+                {text[2]}
+            </Animated.Text>
         </View>
     );
 };

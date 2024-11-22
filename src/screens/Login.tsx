@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {TextInput, Button, StyleSheet} from 'react-native';
+import {TextInput, Button, StyleSheet, Alert} from 'react-native';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -8,17 +8,19 @@ import Animated, {
 } from 'react-native-reanimated';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
-import {useTheme} from '../theme/themeContext';
+import {useTheme} from '../context/themeContext';
 import colorsDarkMode from '../theme/colorsDarkMode';
 import colorsLightMode from '../theme/colorsLightMode';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from './types/NavigationTypes';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from './types/NavigationTypes';
+import authService from '../services/authService'; // Import authService
+import axios from 'axios'; // Axios for making API requests
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const LoginScreen = () => {
     const {t} = useTranslation();
-    const navigation:NavigationProp = useNavigation();
+    const navigation: NavigationProp = useNavigation();
     const {darkMode} = useTheme();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -49,18 +51,39 @@ const LoginScreen = () => {
         backgroundColor: backgroundColor.value,
     }));
 
-    const handleLogin = () => {
-        // Trigger a flash effect on submission
-        backgroundColor.value = withTiming(
-            colors.link,
-            {duration: 100},
-            () => (backgroundColor.value = withTiming(colors.background, {duration: 400})),
-        );
+    // Handle login request
+    const handleLogin = async () => {
+        try {
+            // Flash effect on submission
+            backgroundColor.value = withTiming(
+                colors.link,
+                {duration: 100},
+                () => (backgroundColor.value = withTiming(colors.background, {duration: 400})),
+            );
 
-        // Navigate to AppContainer after a short delay
-        setTimeout(() => {
-            navigation.navigate('AppContainer'); // Ensure the transition happens after animation
-        }, 500);
+            // API request for login
+            const response = await axios.post(
+                'https://close-to-you-backend.onrender.com/api/auth/login',
+                {
+                    email,
+                    password,
+                },
+            );
+
+            if (response.status === 201 && response.data.accessToken) {
+                // Save token on successful login
+                await authService.setToken(response.data.accessToken);
+                console.log('Token saved:', response.data.accessToken);
+
+                // Navigate to the main screen
+                navigation.navigate('AppContainer');
+            } else {
+                Alert.alert(t('error'), t('invalidCredentials'));
+            }
+        } catch (error) {
+            console.error('Login failed:', error);
+            Alert.alert(t('error'), t('loginFailed'));
+        }
     };
 
     return (

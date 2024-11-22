@@ -8,7 +8,7 @@ import {
     Alert,
     ActivityIndicator,
 } from 'react-native';
-import {useTheme} from '../theme/themeContext';
+import {useTheme} from '../context/themeContext';
 import colorsLightMode from '../theme/colorsLightMode';
 import colorsDarkMode from '../theme/colorsDarkMode';
 import {useTranslation} from 'react-i18next';

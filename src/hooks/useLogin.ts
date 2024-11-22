@@ -1,22 +1,22 @@
-import { LoginErrorResponse } from './../interfaces/login/LoginErrorResponse.interface';
-import {LoginBodyRequest} from './../interfaces/login/LoginBodyRequest.interface';
-import {LoginResponse} from './../interfaces/login/LoginResponse.interface';
+import {LoginErrorResponse} from '../interfaces/contacts/login/LoginErrorResponse.interface';
+import {LoginBodyRequest} from '../interfaces/contacts/login/LoginBodyRequest.interface';
+import {LoginResponse} from '../interfaces/contacts/login/LoginResponse.interface';
 import {useState} from 'react';
 import axios from 'axios';
 import {notify} from '../components/NotificationManager';
 import {BaseUrl, LoginUrl} from '../utils/routhes';
 import authService from '../services/authService';
-import {LoginRequestResponse} from '../interfaces/login/LoginRequestResponse.interface';
+import {LoginRequestResponse} from '../interfaces/contacts/login/LoginRequestResponse.interface';
 import {handleLoginError} from './../utils/errors/LoginErrors';
 
 export const useLogin = () => {
-    const [loading, setLoading] = useState(false); // State to manage loading status during the login process
+    const [loading, setLoading] = useState(false);
 
     const login = async (
         requestBody: LoginBodyRequest,
     ): Promise<LoginResponse | LoginErrorResponse> => {
         try {
-            setLoading(true); // Set loading to true while the request is being processed
+            setLoading(true);
 
             // Make the POST request to the login API
             const response = await axios.post<LoginRequestResponse>(
@@ -24,7 +24,7 @@ export const useLogin = () => {
                 requestBody,
                 {
                     headers: {
-                        'Content-Type': 'application/json', // Ensure the content type is application/json for the API request
+                        'Content-Type': 'application/json',
                     },
                 },
             );
@@ -39,6 +39,8 @@ export const useLogin = () => {
                 data.accessToken !== undefined &&
                 response.status === 200
             ) {
+                console.log('Token:', data.accessToken);  // Add this line to verify if the token is being returned correctly.
+
                 // Store the access token using authService if valid
                 await authService.setToken(data.accessToken);
             }

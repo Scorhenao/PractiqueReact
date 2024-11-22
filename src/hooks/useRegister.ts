@@ -1,10 +1,10 @@
-import {RegisterResponse} from './../interfaces/register/RegisterResponse.interface';
+import {RegisterResponse} from '../interfaces/contacts/register/RegisterResponse.interface';
 import {useState} from 'react';
 import {notify} from '../components/NotificationManager';
 import {BaseUrl, RegisterUrl} from '../utils/routhes';
 import axios from 'axios';
-import {RegisterBodyRequest} from '../interfaces/register/RegisterBodyRequest.interface';
-import {RegisterErrorResponse} from '../interfaces/register/RegisterErrorResponse.interface';
+import {RegisterBodyRequest} from '../interfaces/contacts/register/RegisterBodyRequest.interface';
+import {RegisterErrorResponse} from '../interfaces/contacts/register/RegisterErrorResponse.interface';
 import {handleRegisterError} from '../utils/errors/RegisterErrors';
 
 export const useRegister = () => {

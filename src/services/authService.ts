@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TOKEN_KEY = 'userToken';
+const ONBOARDING_KEY = 'onboardingStatus';
 
 export const authService = {
-
     setToken: async (token: string): Promise<void> => {
         try {
             await AsyncStorage.setItem(TOKEN_KEY, token);
@@ -39,6 +39,24 @@ export const authService = {
         } catch (error) {
             console.error('Error removing token:', error);
             throw new Error('Failed to remove token.');
+        }
+    },
+
+    setOnboardingStatus: async (status: boolean): Promise<void> => {
+        try {
+            await AsyncStorage.setItem(ONBOARDING_KEY, JSON.stringify(status));
+        } catch (error) {
+            console.error('Error setting onboarding status:', error);
+        }
+    },
+
+    getOnboardingStatus: async (): Promise<boolean> => {
+        try {
+            const status = await AsyncStorage.getItem(ONBOARDING_KEY);
+            return status ? JSON.parse(status) : false;
+        } catch (error) {
+            console.error('Error getting onboarding status:', error);
+            return false; // Default to false if there's an error
         }
     },
 };

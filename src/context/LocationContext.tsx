@@ -10,6 +10,8 @@ interface LocationContextType {
     } | null;
     getLocation: () => void;
     hasPermission: boolean;
+    darkMode: boolean;
+    toggleDarkMode: () => void;
 }
 
 // Crear el contexto
@@ -23,6 +25,12 @@ interface LocationProviderProps {
 export const LocationProvider = ({children}: LocationProviderProps) => {
     const [location, setLocation] = useState<{latitude: number; longitude: number} | null>(null);
     const [hasPermission, setHasPermission] = useState(false);
+    const [darkMode, setDarkMode] = useState(false); // Estado del modo oscuro
+
+    // Función para alternar el modo oscuro
+    const toggleDarkMode = () => {
+        setDarkMode(!darkMode);
+    };
 
     // Función para obtener la ubicación del usuario
     const getLocation = async () => {
@@ -70,7 +78,14 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
     };
 
     return (
-        <LocationContext.Provider value={{location, getLocation, hasPermission}}>
+        <LocationContext.Provider
+            value={{
+                location,
+                getLocation,
+                hasPermission,
+                darkMode,
+                toggleDarkMode,
+            }}>
             {children}
         </LocationContext.Provider>
     );

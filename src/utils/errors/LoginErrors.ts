@@ -1,7 +1,7 @@
-import { LoginErrorData } from './../../interfaces/login/LoginErrorData';
+import {LoginErrorData} from '../../interfaces/contacts/login/LoginErrorData';
 import {AxiosError} from 'axios';
 import {notify} from '../../components/NotificationManager';
-import {LoginErrorResponse} from '../../interfaces/login/LoginErrorResponse.interface';
+import {LoginErrorResponse} from '../../interfaces/contacts/login/LoginErrorResponse.interface';
 
 export const handleLoginError = (error: AxiosError): LoginErrorResponse => {
     if (error.response) {

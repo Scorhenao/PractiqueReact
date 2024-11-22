@@ -12,7 +12,7 @@ import {
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Picker} from '@react-native-picker/picker';
-import {useTheme} from '../theme/themeContext';
+import {useTheme} from '../context/themeContext';
 import colorsDarkMode from '../theme/colorsDarkMode';
 import colorsLightMode from '../theme/colorsLightMode';
 import {useTranslation} from 'react-i18next';
@@ -22,7 +22,7 @@ import MapView, {Marker} from 'react-native-maps';
 import axios from 'axios';
 import Config from '../../config';
 import IContact from '../interfaces/contact.interface';
-import useContacts from '../components/hooks/useContacts';
+import useContacts from '../hooks/useContacts';
 import {RootStackParamList} from './types/NavigationTypes';
 
 type EditContactScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditContact'>;

@@ -1,14 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, Image, ScrollView} from 'react-native';
 import {RouteProp, useRoute} from '@react-navigation/native';
-import {useTheme} from '../theme/themeContext'; // Import the Theme Context
+import {useTheme} from '../context/themeContext'; // Import the Theme Context
 import colorsDarkMode from '../theme/colorsDarkMode';
 import colorsLightMode from '../theme/colorsLightMode';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Ensure this icon is available
 import i18n from '../i18n'; // Import i18n for translations
 import MapView, {Marker} from 'react-native-maps'; // Import map component
 import axios from 'axios'; // To make API calls for weather info
-import { RootStackParamList } from './types/NavigationTypes';
+import {RootStackParamList} from './types/NavigationTypes';
 
 type ViewContactRouteProp = RouteProp<RootStackParamList, 'ViewContact'>;
 
@@ -27,7 +27,7 @@ const ViewContact: React.FC = () => {
     useEffect(() => {
         if (contact.location) {
             axios
-                .get(`https://api.openweathermap.org/data/2.5/weather`, {
+                .get('https://api.openweathermap.org/data/2.5/weather', {
                     params: {
                         lat: contact.location.latitude,
                         lon: contact.location.longitude,

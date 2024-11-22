@@ -2,11 +2,11 @@ import React from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import colorsDarkMode from '../theme/colorsDarkMode';
 import colorsLightMode from '../theme/colorsLightMode';
-import { useTheme } from '../theme/themeContext';
+import {useTheme} from '../context/themeContext';
 
 const HomeScreen = ({navigation}: any) => {
     const {darkMode} = useTheme();
-    const colors = darkMode ? colorsDarkMode : colorsLightMode;
+    const colors = darkMode ? colorsLightMode : colorsDarkMode;
 
     return (
         <View style={[styles.supContainer, {backgroundColor: colors.background}]}>
@@ -22,7 +22,7 @@ const HomeScreen = ({navigation}: any) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={[styles.button, styles.registerButton]}
+                    style={[styles.button, {backgroundColor: colors.link}]}
                     onPress={() => navigation.navigate('Register')}>
                     <Text style={styles.buttonText}>Register</Text>
                 </TouchableOpacity>
@@ -51,13 +51,11 @@ const styles = StyleSheet.create({
     welcomeText: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#fff', // El color del texto se ajustará al modo oscuro
         textAlign: 'center',
         marginBottom: 10,
     },
     subText: {
         fontSize: 16,
-        color: '#aaa', // Texto más claro en modo oscuro
         textAlign: 'center',
         marginBottom: 30,
     },
@@ -71,9 +69,6 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 16,
         fontWeight: 'bold',
-    },
-    registerButton: {
-        backgroundColor: '#28a745',
     },
 });
 
