@@ -9,20 +9,19 @@ import {
     DeleteContactUrl,
     CreateContactUrl,
 } from '../utils/routes';
-import authService from '../services/authService'; // Import the authService
+import authService from '../services/authService';
 import {Alert} from 'react-native';
+import {notify} from '../components/NotificationManager';
 
-// Configurar instancia de Axios con BaseUrl
 const api = axios.create({
     baseURL: BaseUrl,
 });
 
 const useContacts = () => {
     const [contacts, setContacts] = useState<IContact[]>([]);
-    const [loading, setLoading] = useState(false); // Para manejar el estado de carga
+    const [loading, setLoading] = useState(false);
     const focused = useIsFocused();
 
-    // Función para obtener el token y configurar el encabezado de autorización
     const getAuthHeaders = async () => {
         const token = await authService.getToken();
         if (!token) {
@@ -38,9 +37,9 @@ const useContacts = () => {
     // Cargar contactos desde el backend
     const loadContacts = useCallback(async () => {
         try {
-            const headers = await getAuthHeaders(); // Obtener los encabezados con el token
+            const headers = await getAuthHeaders();
             const response = await api.get(GetContactsUrl, {headers});
-            console.log(response.data); // Verifica la respuesta
+            console.log(response.data);
             setContacts(response.data);
         } catch (error: any) {
             console.error(
@@ -52,16 +51,16 @@ const useContacts = () => {
 
     // Obtener un contacto por ID
     const getContactById = async (id: string) => {
-        setLoading(true); // Set loading to true while fetching data
+        setLoading(true);
         try {
-            const headers = await getAuthHeaders(); // Obtener los encabezados con el token
-            const response = await api.get(`${GetContactsUrl}/${id}`, {headers}); // Petición con el ID
-            return response.data; // Retorna los datos del contacto
+            const headers = await getAuthHeaders();
+            const response = await api.get(`${GetContactsUrl}/${id}`, {headers});
+            return response.data;
         } catch (error: any) {
             console.error('Error fetching contact by ID', error.response?.data || error.message);
             return null;
         } finally {
-            setLoading(false); // Set loading to false after the request finishes
+            setLoading(false);
         }
     };
 
@@ -71,7 +70,6 @@ const useContacts = () => {
         );
     };
 
-    // Añadir un nuevo contacto
     const addContact = async (newContact: IContact, imageUri?: string) => {
         try {
             if (isDuplicateContact(newContact)) {
@@ -120,26 +118,70 @@ const useContacts = () => {
         }
     };
 
-    // Actualizar contacto
-    const updateContact = async (updatedContact: IContact) => {
+    const updateContact = async (updatedContact: IContact, imageUri?: string) => {
         try {
+            const formData = new FormData();
+
+            // Agregar los datos del contacto al FormData
+            formData.append('name', updatedContact.name);
+            formData.append('phone', updatedContact.phone);
+
+            if (updatedContact.email) {
+                formData.append('email', updatedContact.email);
+            }
+            if (updatedContact.contactType) {
+                formData.append('contactType', updatedContact.contactType);
+            }
+            if (updatedContact.latitude) {
+                formData.append('latitude', updatedContact.latitude.toString());
+            }
+            if (updatedContact.longitude) {
+                formData.append('longitude', updatedContact.longitude.toString());
+            }
+
+            // Agregar la imagen, si existe
+            if (imageUri) {
+                formData.append('file', {
+                    uri: imageUri,
+                    name: 'profile.jpg', // Cambia el nombre si es necesario
+                    type: 'image/jpeg', // Cambia el tipo MIME si es necesario
+                });
+            }
+
             const headers = await getAuthHeaders();
-            const response = await api.patch(
-                `${EditContactUrl}/${updatedContact.id}`,
-                updatedContact,
-                {headers},
-            );
+
+            // Enviar la solicitud de actualización al backend
+            const response = await api.patch(`${EditContactUrl}/${updatedContact.id}`, formData, {
+                headers: {
+                    ...headers,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            // Actualizar la lista de contactos localmente
             setContacts(prevContacts =>
                 prevContacts.map(contact =>
                     contact.id === updatedContact.id ? response.data : contact,
                 ),
             );
-        } catch (error) {
+
+            notify('success', 'Contact Updated', 'The contact was updated successfully.');
+        } catch (error: any) {
             console.error('Error updating contact', error);
+            if (error.response) {
+                console.error('Server Error:', error.response.data);
+                notify(
+                    'danger',
+                    'Server Error',
+                    error.response.data.message || 'Failed to update contact.',
+                );
+            } else {
+                console.error('Network Error:', error.message);
+                notify('danger', 'Network Error', 'Network error occurred. Please try again.');
+            }
         }
     };
 
-    // Eliminar contacto
     const deleteContact = async (contactId: number) => {
         try {
             const headers = await getAuthHeaders();
@@ -150,7 +192,6 @@ const useContacts = () => {
         }
     };
 
-    // Cargar contactos cuando la pantalla se enfoca
     useEffect(() => {
         if (focused) {
             loadContacts();
@@ -159,7 +200,7 @@ const useContacts = () => {
 
     return {
         contacts,
-        loading, // Exponer estado de carga
+        loading,
         getContactById,
         addContact,
         updateContact,

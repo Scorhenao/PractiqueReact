@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {View, TextInput, StyleSheet, TouchableOpacity, Text, Image, ScrollView} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -10,8 +10,6 @@ import {useTranslation} from 'react-i18next';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {launchImageLibrary} from 'react-native-image-picker';
 import MapView, {Marker} from 'react-native-maps';
-import axios from 'axios';
-import Config from '../../config';
 import IContact from '../interfaces/contact.interface';
 import useContacts from '../hooks/useContacts';
 import {RootStackParamList} from './types/NavigationTypes';
@@ -22,94 +20,67 @@ type EditContactScreenNavigationProp = StackNavigationProp<RootStackParamList, '
 const EditContact: React.FC = () => {
     const navigation = useNavigation<EditContactScreenNavigationProp>();
     const route = useRoute();
-    const {loadContacts, updateContact} = useContacts();
     const {contact} = route.params as {contact: IContact};
-
+    const {loadContacts, updateContact} = useContacts();
     const {t} = useTranslation();
     const {darkMode} = useTheme();
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
 
-    const [name, setName] = useState(contact.name);
-    const [phone, setPhone] = useState(contact.phone);
-    const [email, setEmail] = useState(contact.email);
+    const [name, setName] = useState(contact.name || '');
+    const [phone, setPhone] = useState(contact.phone || '');
+    const [email, setEmail] = useState(contact.email || '');
     const [image, setImage] = useState(contact.image || '');
     const [contactType, setContactType] = useState(contact.isEmployee ? 'Employee' : 'Client');
     const [location, setLocation] = useState(contact.location || {latitude: 0, longitude: 0});
-    const [weather, setWeather] = useState(null);
-
-    useEffect(() => {
-        if (location.latitude && location.longitude) {
-            // Fetch weather data based on location
-            fetchWeather(location.latitude, location.longitude);
-        }
-    }, [location]);
-
-    const fetchWeather = async (lat: number, lon: number) => {
-        const apikey = Config.openWeatherMapKey;
-        try {
-            const response = await axios.get('https://api.openweathermap.org/data/2.5/weather', {
-                params: {
-                    lat,
-                    lon,
-                    appid: apikey, // Replace with your OpenWeatherMap API key
-                    units: 'metric',
-                },
-            });
-            setWeather(response.data);
-        } catch (error) {
-            console.error('Error fetching weather:', error);
-        }
-    };
 
     const handleImagePick = async () => {
-        const options = {
-            mediaType: 'photo' as const,
-            includeBase64: true,
-        };
+        try {
+            const result = await launchImageLibrary({
+                mediaType: 'photo',
+                includeBase64: true,
+            });
 
-        const result = await launchImageLibrary(options);
-
-        if (result.assets && result.assets.length > 0) {
-            const uri = result.assets[0].uri;
-            if (uri) {
-                setImage(uri);
+            if (result.assets && result.assets.length > 0) {
+                const uri = result.assets[0].uri;
+                if (uri) {
+                    setImage(uri);
+                } else {
+                    notify('danger', t('error'), t('failedToPickImage'));
+                }
             } else {
-                notify('danger', 'Error', 'Failed to get image URI.');
+                notify('danger', t('error'), t('noImageSelected'));
             }
-        } else {
-            notify('danger', 'Error', 'Failed to pick an image.');
+        } catch (error) {
+            console.error('Error picking image:', error);
+            notify('danger', t('error'), t('failedToPickImage'));
         }
     };
 
     const handleSave = async () => {
-        // Prepare the updated contact data
+        if (!name.trim() || !phone.trim()) {
+            notify('warning', t('warning'), t('nameAndPhoneRequired'));
+            return;
+        }
+
         const updatedContact: IContact = {
             ...contact,
-            name: name || contact.name,
-            phone: phone || contact.phone,
-            email: email || contact.email,
-            image: image || contact.image,
+            name: name.trim(),
+            phone: phone.trim(),
+            email: email.trim() || '',
             isEmployee: contactType === 'Employee',
-            location: location,
-            profilePicture: image || contact.image, // Ensure to update the profile picture
             latitude: location.latitude,
-            longitude: location.longitude, // Location coordinates
+            longitude: location.longitude,
         };
 
         try {
-            // Call the updateContact function, which will make the PATCH request
-            await updateContact(updatedContact);
-            await loadContacts(); // Reload the contacts after the update
-
-            // Notify the user about the successful update
-            notify('success', t('success'), t('contact Updated Successfully'));
-
-            // Navigate back to the AppContainer screen
-            navigation.navigate('AppContainer');
+            // Llama a updateContact con los datos y la imagen (si existe)
+            await updateContact(updatedContact, image);
+            await loadContacts();
+            notify('success', t('success'), t('contactUpdatedSuccessfully'));
+            navigation.goBack();
         } catch (error) {
-            // Notify the user about the error
-            notify('danger', t('error'), t('failed To Update Contact'));
             console.error('Error updating contact:', error);
+            notify('danger', t('error'), t('failedToUpdateContact'));
         }
     };
 
@@ -118,7 +89,7 @@ const EditContact: React.FC = () => {
             <ScrollView
                 contentContainerStyle={styles.scrollContainer}
                 showsVerticalScrollIndicator={false}>
-                {/* Contact Image */}
+                {/* Image Picker */}
                 <TouchableOpacity onPress={handleImagePick} style={styles.imageContainer}>
                     {image ? (
                         <Image source={{uri: image}} style={styles.image} />
@@ -190,14 +161,6 @@ const EditContact: React.FC = () => {
                         onPress={e => setLocation(e.nativeEvent.coordinate)}>
                         <Marker coordinate={location} />
                     </MapView>
-                    {weather && (
-                        <View style={styles.weatherContainer}>
-                            <Text style={styles.weatherText}>
-                                {t('weather')}: {weather.main.temp}°C,{' '}
-                                {weather.weather[0].description}
-                            </Text>
-                        </View>
-                    )}
                 </View>
 
                 {/* Save Button */}
@@ -270,19 +233,8 @@ const styles = StyleSheet.create({
     map: {
         flex: 1,
     },
-    weatherContainer: {
-        position: 'absolute',
-        bottom: 10,
-        left: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        padding: 5,
-        borderRadius: 5,
-    },
-    weatherText: {
-        color: '#fff',
-    },
     scrollContainer: {
-        overflow: 'hidden',
+        paddingBottom: 20,
     },
 });
 
