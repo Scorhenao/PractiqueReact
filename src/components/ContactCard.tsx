@@ -15,13 +15,10 @@ interface ContactCardProps {
 }
 
 const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) => {
-    const {phone, name, image, isEmployee, id} = contact;
-
+    const {phone, name, isEmployee, id, profilePicture} = contact;
     const [modalVisible, setModalVisible] = useState(false);
     const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
-    const [hover, setHover] = useState(false); // State for hover effect
     const colors = darkMode ? colorsDarkMode : colorsLightMode;
-
     const navigation = useNavigation<EditContactScreenNavigationProp>();
 
     const toggleModal = () => {
@@ -37,7 +34,14 @@ const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) 
         <View style={[styles.container, {backgroundColor: colors.background}]}>
             <TouchableOpacity style={styles.contactInfo} onLongPress={toggleModal}>
                 <View style={styles.imageContainer}>
-                    <Image source={{uri: image}} style={styles.contactImage} />
+                    <Image
+                        source={
+                            profilePicture && profilePicture.startsWith('http')
+                                ? {uri: profilePicture}
+                                : require('../assets/imgs/default-img.png')
+                        } // Fallback image if URL doesn't exist
+                        style={styles.contactImage}
+                    />
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={[styles.contactName, {color: colors.textContacts}]}>{name}</Text>
@@ -126,16 +130,16 @@ const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) 
                             {backgroundColor: colors.secondaryBackground},
                         ]}>
                         <Text style={[styles.confirmText, {color: colors.text}]}>
-                            Are you sure you want to delete this contact?
+                            {i18n.t('confirmDelete')}
                         </Text>
                         <View style={styles.confirmButtonContainer}>
                             <TouchableOpacity onPress={handleDelete} style={styles.confirmButton}>
-                                <Text style={{color: '#FF0000'}}>Yes</Text>
+                                <Text style={{color: '#FF0000'}}>{i18n.t('yes')}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => setConfirmDeleteVisible(false)}
                                 style={styles.confirmButton}>
-                                <Text style={{color: colors.link}}>No</Text>
+                                <Text style={{color: colors.link}}>{i18n.t('no')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

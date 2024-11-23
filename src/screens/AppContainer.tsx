@@ -20,7 +20,7 @@ export const AppContainer: React.FC = () => {
 
     const onRefresh = () => {
         setRefreshing(true);
-        loadContacts(); // Call the updated loadContacts method from the hook
+        loadContacts();
         setRefreshing(false);
     };
 
