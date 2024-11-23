@@ -13,3 +13,4 @@ export const DeleteContactUrl = '/api/contacts'; //DELETE
 
 // Users
 export const GetUserByIdUrl = '/api/users'; //GET id al final de la url
+export const EditUserByIdUrl = '/api/users/'; //PATCH

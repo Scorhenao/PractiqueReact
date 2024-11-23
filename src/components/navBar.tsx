@@ -141,7 +141,8 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
                     </TouchableOpacity>
                     {/* Profile Icon */}
                     <View style={styles.profileContainer}>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('ProfileScreen')}>
                             <FontAwesome name="user-circle" size={25} color={colors.text} />
                         </TouchableOpacity>
                         <Text style={[styles.profileName, {color: colors.text}]}>

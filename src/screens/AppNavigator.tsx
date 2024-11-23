@@ -17,6 +17,9 @@ import HelpScreen from './HelpScreen';
 import {useTheme} from '../context/themeContext';
 import colorsDarkMode from '../theme/colorsDarkMode';
 import colorsLightMode from '../theme/colorsLightMode';
+import ProfileScreen from './ProfileScreen';
+import EditProfileScreen from './EditProfileScreen';
+import {useNavigation} from '@react-navigation/native';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -25,6 +28,7 @@ export default function AppNavigator() {
     const [isOnboardingCompleted, setIsOnboardingCompleted] = useState<boolean>(false);
     const darkmode = useTheme();
     const colors = darkmode ? colorsDarkMode : colorsLightMode;
+    const navigation = useNavigation<any>();
 
     useEffect(() => {
         const checkUserStatus = async () => {
@@ -34,13 +38,22 @@ export default function AppNavigator() {
             console.log('Token:', token);
             console.log('Onboarding completed:', onboardingStatus);
 
-            setIsLoggedIn(!!token); // Si hay token, el usuario está logueado
-            setIsOnboardingCompleted(onboardingStatus); // Recupera el estado del onboarding
+            // Actualizamos el estado primero
+            setIsLoggedIn(!!token);
+            setIsOnboardingCompleted(onboardingStatus);
+
+            // Navegamos dependiendo del estado
+            if (token) {
+                navigation.navigate('AppContainer');
+            } else {
+                navigation.navigate(onboardingStatus ? 'Login' : 'OnboardingScreen');
+            }
         };
 
         checkUserStatus();
-    }, []);
+    }, [navigation]);
 
+    // Si el estado aún no se ha cargado, mostramos la pantalla de carga
     if (isLoggedIn === null) {
         return <LoadingScreen />;
     }
@@ -60,7 +73,7 @@ export default function AppNavigator() {
                 name="OnboardingScreen"
                 component={OnboardingScreen}
             />
-            <Stack.Screen name="HelpScreen" component={HelpScreen}  />
+            <Stack.Screen name="HelpScreen" component={HelpScreen} />
             <Stack.Screen options={{headerShown: false}} name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
@@ -74,7 +87,8 @@ export default function AppNavigator() {
             <Stack.Screen name="ViewContact" component={ViewContact} />
             <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
             <Stack.Screen name="SelectLocation" component={SelectLocation} />
-
+            <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+            <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
         </Stack.Navigator>
     );
 }

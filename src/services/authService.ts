@@ -46,7 +46,7 @@ export const authService = {
         }
 
         try {
-            const decodedToken: payload = jwtDecode(token); // Desencripta el token
+            const decodedToken: payload = jwtDecode(token);
             const userId = decodedToken.userId;
             return userId;
         } catch (error) {
@@ -88,7 +88,7 @@ export const authService = {
         try {
             const decodedToken: any = jwtDecode(token);
             const now = Date.now() / 1000;
-            return decodedToken.exp > now; // Comprueba que el token no ha expirado
+            return decodedToken.exp > now;
         } catch (error) {
             console.error('Error decoding token:', error);
             return false;
