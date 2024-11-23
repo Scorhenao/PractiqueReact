@@ -23,6 +23,7 @@ import {RootStackParamList} from './types/NavigationTypes';
 import {useRegister} from '../hooks/useRegister';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {useNavigation} from '@react-navigation/native';
+import { styles } from './styles/RegisterContact.styles';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -158,44 +159,5 @@ const RegisterScreen = () => {
         </Animated.View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        textAlign: 'center',
-    },
-    inputContainer: {
-        position: 'relative',
-        width: '100%',
-    },
-    input: {
-        height: 40,
-        width: '100%',
-        borderWidth: 1,
-        borderRadius: 5,
-        marginBottom: 15,
-        paddingHorizontal: 10,
-    },
-    button: {
-        height: 40,
-        width: '100%',
-        borderRadius: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    eyeIcon: {
-        position: 'absolute',
-        right: 10,
-        top: 8,
-    },
-});
 
 export default RegisterScreen;
