@@ -35,6 +35,8 @@ const resources = {
             noWeather: 'Select a location to see the weather',
             chooseImage: 'Choose Image',
             takePicture: 'Take Picture',
+            FailedToSyncContacts: 'Failed to sync contacts. Try again...',
+            syncContacts: 'Sync Contacts',
         },
     },
     es: {
@@ -68,6 +70,8 @@ const resources = {
             noWeather: 'Selecciona una ubicación para ver el clima',
             chooseImage: 'Seleccionar Imagen',
             takePicture: 'Tomar Foto',
+            FailedToSyncContacts: 'No se pudieron sincronizar los contactos. Intenta denuevo...',
+            syncContacts: 'Sincronizar Contactos',
         },
     },
 };

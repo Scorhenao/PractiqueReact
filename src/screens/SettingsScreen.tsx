@@ -1,29 +1,36 @@
 import React, {useState} from 'react';
-import {View, Text, Button, StyleSheet, ActivityIndicator, Alert} from 'react-native';
+import {View, Text, Button, StyleSheet, ActivityIndicator} from 'react-native';
 import ContactCard from '../components/ContactCard';
-import {syncContacts} from '../services/syncContactsService'; // Importar el servicio de sincronización
-import {useNavigation} from '@react-navigation/native'; // Para navegación
+import {syncContacts} from '../services/syncContactsService';
+import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from './types/NavigationTypes'; // Tipos de navegación
+import {RootStackParamList} from './types/NavigationTypes';
 import IContact from '../interfaces/contact.interface';
 import useContacts from '../hooks/useContacts';
+import colorsDarkMode from '../theme/colorsDarkMode';
+import colorsLightMode from '../theme/colorsLightMode';
+import {useTheme} from '../context/themeContext';
+import {useTranslation} from 'react-i18next';
+import {notify} from '../components/NotificationManager';
 
 type SettingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SettingsScreen'>;
 
 const SettingsScreen = () => {
-    const [contacts, setContacts] = useState<IContact[]>([]); // Usamos IContact aquí
+    const [contacts, setContacts] = useState<IContact[]>([]);
     const [loading, setLoading] = useState(false);
     const navigation = useNavigation<SettingsScreenNavigationProp>();
     const {addContact} = useContacts();
-    // Función para sincronizar contactos
+    const {darkmode} = useTheme();
+    const colors = darkmode ? colorsLightMode : colorsDarkMode;
+    const {t} = useTranslation(); // Hook para traducir textos
+
     const handleSyncContacts = async () => {
         setLoading(true);
         try {
-            const syncedContacts = await syncContacts(); // Llamamos al servicio
+            const syncedContacts = await syncContacts();
 
-            // Mapeamos los contactos para que coincidan con IContact
             const mappedContacts: IContact[] = syncedContacts.map(contact => ({
-                id: Number(contact.recordID), // Usamos recordID como id
+                id: Number(contact.recordID),
                 name: contact.givenName,
                 phone: contact.phoneNumbers[0]?.number || '',
                 email: contact.emailAddresses[0]?.email || '',
@@ -36,17 +43,15 @@ const SettingsScreen = () => {
                 location: null,
             }));
 
-            // Enviar los contactos al backend
             for (const contact of mappedContacts) {
                 await addContact(contact);
             }
 
             setContacts(mappedContacts);
 
-            // Navegamos a AppContainer con los contactos sincronizados
             navigation.navigate('AppContainer', {syncContacts: mappedContacts});
         } catch (error) {
-            Alert.alert('Error', 'Failed to sync contacts. Please try again.');
+            notify('danger', t('error'), t('FailedToSyncContacts'));
         } finally {
             setLoading(false);
         }
@@ -57,9 +62,9 @@ const SettingsScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Settings</Text>
-            <Button title="Sync Contacts" onPress={handleSyncContacts} />
+        <View style={[styles.container, {backgroundColor: colors.background}]}>
+            <Text style={[styles.title, {color: colors.text}]}>{t('settings')}</Text>
+            <Button title={t('syncContacts')} onPress={handleSyncContacts} />
             {loading && <ActivityIndicator size="large" color="#0000ff" />}
             {!loading &&
                 contacts.length > 0 &&
