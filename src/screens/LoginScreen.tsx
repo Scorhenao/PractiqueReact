@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {TextInput, Button, StyleSheet} from 'react-native';
+import {TextInput, Button, StyleSheet, TouchableOpacity} from 'react-native';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -16,7 +16,8 @@ import {RootStackParamList} from './types/NavigationTypes';
 import authService from '../services/authService'; // Import authService
 import axios from 'axios'; // Axios for making API requests
 import {notify} from '../components/NotificationManager';
-import { BaseUrl, LoginUrl } from '../utils/routhes';
+import {BaseUrl, LoginUrl} from '../utils/routhes';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -26,6 +27,7 @@ const LoginScreen = () => {
     const {darkMode} = useTheme();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
 
@@ -88,7 +90,7 @@ const LoginScreen = () => {
             } else {
                 notify('danger', 'error', 'Invalid credentials');
             }
-        } catch (error:any) {
+        } catch (error: any) {
             console.error('Login failed:', error.message);
             notify('warning', 'error', 'Login failed');
         }
@@ -105,20 +107,30 @@ const LoginScreen = () => {
                     style={[styles.input, {color: colors.text, borderColor: colors.text}]}
                     placeholder={t('emailPlaceholder')}
                     placeholderTextColor={colors.placeholder}
-                    secureTextEntry
                     value={email}
                     onChangeText={setEmail}
                     textContentType="emailAddress"
                 />
+
                 <TextInput
                     style={[styles.input, {color: colors.text, borderColor: colors.text}]}
                     placeholder={t('passwordPlaceholder')}
                     placeholderTextColor={colors.placeholder}
-                    secureTextEntry
+                    secureTextEntry={!showPassword} // Alterna la visibilidad
                     value={password}
                     onChangeText={setPassword}
                     textContentType="password"
                 />
+
+                <TouchableOpacity
+                    style={styles.eyeIcon}
+                    onPress={() => setShowPassword(!showPassword)}>
+                    <FontAwesome
+                        name={showPassword ? 'eye' : 'eye-slash'} // Cambia el ícono según el estado
+                        size={20}
+                        color={colors.placeholder}
+                    />
+                </TouchableOpacity>
             </Animated.View>
 
             <Button title={t('save')} onPress={handleLogin} color={colors.link} />
@@ -144,6 +156,11 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: 15,
         paddingHorizontal: 10,
+    },
+    eyeIcon: {
+        position: 'absolute',
+        right: 10,
+        top: 63,
     },
 });
 
