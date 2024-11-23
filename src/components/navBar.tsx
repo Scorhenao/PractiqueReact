@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, TouchableWithoutFeedback} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {Dropdown} from 'react-native-element-dropdown';
@@ -11,16 +11,21 @@ import {useNavigation} from '@react-navigation/native';
 import DarkModeToggle from './DarkModeToggle';
 import {RootStackParamList} from '../screens/types/NavigationTypes';
 import {StackNavigationProp} from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type NavigationProp = StackNavigationProp<RootStackParamList>;
+// Define las props del NavBar
+type NavBarProps = {
+    toggleDropdown: () => void;
+    dropdownVisible: boolean;
+};
 
-const NavBar = () => {
-    const [showMenu, setShowMenu] = useState(false);
-    const navigation: NavigationProp = useNavigation();
+const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
     const [showSearch, setShowSearch] = useState(false);
     const [search, setSearch] = useState('');
     const [language, setLanguage] = useState('US');
+    const [profileName, setProfileName] = useState<string>(''); // Estado para almacenar el nombre del perfil
     const {darkMode, toggleDarkMode} = useTheme();
+    const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
 
     const changeLanguage = (lang: string) => {
@@ -34,18 +39,33 @@ const NavBar = () => {
     ];
 
     const handleCloseMenu = () => {
-        setShowMenu(false);
+        toggleDropdown(); // Cierra el menú usando el toggle
     };
+
+    // Use effect para cargar el nombre del perfil desde AsyncStorage
+    useEffect(() => {
+        const loadProfileName = async () => {
+            try {
+                const name = await AsyncStorage.getItem('profileName');
+                if (name) {
+                    setProfileName(name);
+                }
+            } catch (error) {
+                console.error('Error loading profile name from AsyncStorage', error);
+            }
+        };
+        loadProfileName();
+    }, []);
 
     return (
         <TouchableWithoutFeedback onPress={handleCloseMenu}>
             <View style={[styles.navbarContainer, {backgroundColor: colors.navBackground}]}>
                 {/* Dropdown Menu - Left */}
                 <View style={styles.relative}>
-                    <TouchableOpacity onPress={() => setShowMenu(!showMenu)}>
+                    <TouchableOpacity onPress={toggleDropdown}>
                         <FontAwesome name="bars" size={24} color={colors.text} />
                     </TouchableOpacity>
-                    {showMenu && (
+                    {dropdownVisible && (
                         <View
                             style={[
                                 styles.menuContainer,
@@ -124,7 +144,8 @@ const NavBar = () => {
                             <FontAwesome name="user-circle" size={25} color={colors.text} />
                         </TouchableOpacity>
                         <Text style={[styles.profileName, {color: colors.text}]}>
-                            {i18n.t('profileName')}
+                            {profileName || i18n.t('profileName')}{' '}
+                            {/* Mostrar el nombre del perfil desde AsyncStorage */}
                         </Text>
                     </View>
                 </View>
