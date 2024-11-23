@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {TextInput, Button, StyleSheet, TouchableOpacity} from 'react-native';
+import {TextInput, Button, TouchableOpacity} from 'react-native';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -18,8 +18,9 @@ import axios from 'axios'; // Axios for making API requests
 import {notify} from '../components/NotificationManager';
 import {BaseUrl, LoginUrl} from '../utils/routhes';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {styles} from './styles/LoginContact.styles';
 
-type NavigationProp = StackNavigationProp<RootStackParamList>;
+type NavigationProp = StackNavigationProp<RootStackParamList >;
 
 const LoginScreen = () => {
     const {t} = useTranslation();
@@ -31,13 +32,11 @@ const LoginScreen = () => {
 
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
 
-    // Animation values
     const titleOpacity = useSharedValue(0);
     const inputOpacity = useSharedValue(0);
     const backgroundColor = useSharedValue(colors.background);
 
     React.useEffect(() => {
-        // Trigger animations on mount
         titleOpacity.value = withTiming(2, {duration: 2000, easing: Easing.out(Easing.exp)});
         inputOpacity.value = withTiming(1, {duration: 1000, easing: Easing.out(Easing.exp)});
     }, [inputOpacity, titleOpacity, backgroundColor]);
@@ -85,7 +84,6 @@ const LoginScreen = () => {
                     }
                 }
 
-                // Navegar a la pantalla principal
                 navigation.navigate('AppContainer');
             } else {
                 notify('danger', 'error', 'Invalid credentials');
@@ -137,31 +135,5 @@ const LoginScreen = () => {
         </Animated.View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        textAlign: 'center',
-    },
-    input: {
-        height: 40,
-        borderWidth: 1,
-        borderRadius: 5,
-        marginBottom: 15,
-        paddingHorizontal: 10,
-    },
-    eyeIcon: {
-        position: 'absolute',
-        right: 10,
-        top: 63,
-    },
-});
 
 export default LoginScreen;
