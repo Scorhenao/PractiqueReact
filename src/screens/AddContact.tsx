@@ -81,8 +81,8 @@ const AddContact = () => {
             phone,
             image: imageUri,
             contactType: 'Employee',
-            logitud: location?.longitude,
-            latitud: location?.latitude,
+            longitude: location?.longitude,
+            latitude: location?.latitude,
             profilePicture: imageUri,
         };
 

@@ -4,6 +4,7 @@ interface IContact {
     phone: string;
     email: string;
     image: string | null;
+    contactType: string | null;
     profilePicture: string | null;
     isEmployee: boolean; // Employee or Client
     latitude: number;

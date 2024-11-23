@@ -2,12 +2,7 @@ import {useState, useEffect, useCallback} from 'react';
 import axios from 'axios';
 import IContact from '../interfaces/contact.interface';
 import {useIsFocused} from '@react-navigation/native';
-import {
-    BaseUrl,
-    GetContactsUrl,
-    EditContactUrl,
-    DeleteContactUrl,
-} from '../utils/routhes';
+import {BaseUrl, GetContactsUrl, EditContactUrl, DeleteContactUrl} from '../utils/routhes';
 import authService from '../services/authService'; // Import the authService
 import {Alert} from 'react-native';
 
@@ -64,44 +59,41 @@ const useContacts = () => {
                 return;
             }
 
-            let uploadedImageUrl = '';
+            const formData = new FormData();
+            formData.append('name', newContact.name);
+            formData.append('phone', newContact.phone);
 
-            // Upload image if exists
+            // Add optional fields to FormData if available
+            if (newContact.email) {formData.append('email', newContact.email);}
+            if (newContact.contactType) {formData.append('contactType', newContact.contactType);}
+            if (newContact.latitude){ formData.append('latitude', newContact.latitude.toString());}
+            if (newContact.longitude) {formData.append('longitude', newContact.longitude.toString());}
+
+            // If image URI exists, append the profile picture to FormData
             if (imageUri) {
-                const formData = new FormData();
                 formData.append('file', {
                     uri: imageUri,
                     name: 'profile.jpg',
                     type: 'image/jpeg',
                 });
-
-                const uploadResponse = await api.post('/api/upload/image', formData, {
-                    headers: {'Content-Type': 'multipart/form-data'},
-                });
-                uploadedImageUrl = uploadResponse.data.url; // Assuming the backend returns the URL
             }
 
             // Get authentication headers
             const headers = await getAuthHeaders();
 
             // Send the contact data to the backend
-            const response = await api.post(
-                '/api/contacts', // Ensure the correct endpoint
-                {
-                    ...newContact,
-                    contactType: newContact.isEmployee ? 'Employee' : 'Client',
-                    latitude: newContact.location?.latitude,
-                    longitude: newContact.location?.longitude,
-                    profilePicture: uploadedImageUrl,
+            const response = await api.post('/api/contacts', formData, {
+                headers: {
+                    ...headers,
+                    'Content-Type': 'multipart/form-data', // Explicitly set the content type to multipart/form-data
                 },
-                {headers},
-            );
+            });
 
             // Update the local contacts list
             setContacts(prevContacts => [...prevContacts, response.data]);
         } catch (error: any) {
-            console.error('Error adding contact to backend', error.message); // Log error message
-            console.error('Error details:', error.response?.data || error); // Log error response data if available
+            console.error('Error adding contact to backend', error.message);
+            console.error('Error details:', error.response?.data || error);
             Alert.alert('Error', 'There was an issue adding the contact.');
         }
     };
