@@ -23,9 +23,9 @@ export const AppContainer: React.FC = () => {
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [page, setPage] = useState(1); // Estado para la página de contactos
-    const [loadingMore, setLoadingMore] = useState(false); // Indicador de carga de más elementos
-    const [loadingMessage, setLoadingMessage] = useState<string>(''); // Mensaje de carga
+    const [page, setPage] = useState(1);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [loadingMessage, setLoadingMessage] = useState<string>('');
     const {darkMode} = useTheme();
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
 
@@ -39,7 +39,7 @@ export const AppContainer: React.FC = () => {
     const loadMoreContacts = () => {
         if (loadingMore) {
             return;
-        } // Evita cargar más si ya estamos cargando
+        }
         setLoadingMessage('Cargando más contactos...');
         setLoadingMore(true);
         setPage(prevPage => {

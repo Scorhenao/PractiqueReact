@@ -20,6 +20,8 @@ const OnboardingScreen = () => {
     const completeOnboarding = async () => {
         try {
             await authService.setOnboardingStatus(true);
+            const status = await authService.getOnboardingStatus();
+            console.log('Onboarding Status after completion:', status); // Asegúrate de que el estado se guarda correctamente
             navigation.replace('HomeScreen');
         } catch (error) {
             console.error('Error completing onboarding:', error);

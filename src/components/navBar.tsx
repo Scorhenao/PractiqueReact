@@ -13,7 +13,6 @@ import {RootStackParamList} from '../screens/types/NavigationTypes';
 import {StackNavigationProp} from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Define las props del NavBar
 type NavBarProps = {
     toggleDropdown: () => void;
     dropdownVisible: boolean;
@@ -23,7 +22,7 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
     const [showSearch, setShowSearch] = useState(false);
     const [search, setSearch] = useState('');
     const [language, setLanguage] = useState('US');
-    const [profileName, setProfileName] = useState<string>(''); // Estado para almacenar el nombre del perfil
+    const [profileName, setProfileName] = useState<string>('');
     const {darkMode, toggleDarkMode} = useTheme();
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
@@ -39,10 +38,9 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
     ];
 
     const handleCloseMenu = () => {
-        toggleDropdown(); // Cierra el menú usando el toggle
+        toggleDropdown();
     };
 
-    // Use effect para cargar el nombre del perfil desde AsyncStorage
     useEffect(() => {
         const loadProfileName = async () => {
             try {
