@@ -1,58 +1,106 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, Image, ScrollView} from 'react-native';
 import {RouteProp, useRoute} from '@react-navigation/native';
-import {useTheme} from '../context/themeContext'; // Import the Theme Context
+import {useTheme} from '../context/themeContext';
 import colorsDarkMode from '../theme/colorsDarkMode';
 import colorsLightMode from '../theme/colorsLightMode';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Ensure this icon is available
-import i18n from '../i18n'; // Import i18n for translations
-import MapView, {Marker} from 'react-native-maps'; // Import map component
-import axios from 'axios'; // To make API calls for weather info
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import i18n from '../i18n';
+import MapView, {Marker} from 'react-native-maps';
+import axios from 'axios';
+import {OPEN_WEATHER_MAP_KEY} from '@env';
 import {RootStackParamList} from './types/NavigationTypes';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 type ViewContactRouteProp = RouteProp<RootStackParamList, 'ViewContact'>;
+
+const DEFAULT_IMAGE = 'https://via.placeholder.com/250';
 
 const ViewContact: React.FC = () => {
     const route = useRoute<ViewContactRouteProp>();
     const {contact} = route.params;
 
-    const {darkMode} = useTheme(); // Get darkMode from context
-    const [weather, setWeather] = useState<any>(null); // Weather data state
-    const [isWeatherLoading, setIsWeatherLoading] = useState(true); // Loading state for weather
+    const {darkMode} = useTheme();
+    const [weather, setWeather] = useState<any>(null);
+    const [isWeatherLoading, setIsWeatherLoading] = useState(true);
+    const [weatherError, setWeatherError] = useState(false);
 
-    // Theme colors based on darkMode state
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
 
-    // Fetch weather information based on the contact's location
+    const defaultCoordinates = {
+        latitude: 37.7749,
+        longitude: -122.4194,
+    };
+
+    const latitude = contact.latitude || defaultCoordinates.latitude;
+    const longitude = contact.longitude || defaultCoordinates.longitude;
+
     useEffect(() => {
-        if (contact.location) {
+        if (latitude && longitude) {
+            setIsWeatherLoading(true);
             axios
                 .get('https://api.openweathermap.org/data/2.5/weather', {
                     params: {
-                        lat: contact.location.latitude,
-                        lon: contact.location.longitude,
-                        appid: 'cef79c5526143f4464385b042afcf95f', // Replace with your API key
+                        lat: latitude,
+                        lon: longitude,
+                        appid: OPEN_WEATHER_MAP_KEY || 'cef79c5526143f4464385b042afcf95f',
                         units: 'metric',
                     },
                 })
                 .then(response => {
-                    setWeather(response.data);
-                    setIsWeatherLoading(false);
+                    if (response.data && response.data.weather) {
+                        setWeather(response.data);
+                        setWeatherError(false);
+                    } else {
+                        setWeatherError(true);
+                    }
                 })
                 .catch(error => {
-                    console.error('Error fetching weather data:', error);
-                    setIsWeatherLoading(false);
-                });
+                    console.error('Error al obtener el clima:', error);
+                    setWeatherError(true);
+                })
+                .finally(() => setIsWeatherLoading(false));
+        } else {
+            setIsWeatherLoading(false);
         }
-    }, [contact.location]);
+    }, [latitude, longitude]);
+
+    const getWeatherIcon = () => {
+        if (!weather) {
+            return 'cloud';
+        }
+        const mainWeather = weather.weather[0].main.toLowerCase().trim();
+        switch (mainWeather) {
+            case 'clear':
+                return 'sun';
+            case 'clouds':
+                return 'cloud';
+            case 'rain':
+                return 'cloud-rain';
+            case 'snow':
+                return 'snowflake';
+            case 'drizzle':
+            case 'mist':
+            case 'haze':
+                return 'cloud-drizzle';
+            default:
+                return 'cloud';
+        }
+    };
 
     return (
         <ScrollView>
             <View style={[styles.container, {backgroundColor: colors.background}]}>
                 <Image
-                    source={{uri: contact.image || 'default_image_uri'}} // Use a default image if null
+                    source={
+                        contact.profilePicture
+                            ? {uri: contact.profilePicture}
+                            : {uri: DEFAULT_IMAGE}
+                    }
                     style={styles.image}
+                    resizeMode="cover"
                 />
+
                 <View style={styles.contactInfo}>
                     <Icon name="person" size={24} color={colors.text} />
                     <Text style={[styles.text, {color: colors.text}]}>
@@ -83,41 +131,52 @@ const ViewContact: React.FC = () => {
                     </Text>
                 </View>
 
-                {/* Map View */}
-                {contact.location && (
-                    <MapView
-                        style={styles.map}
-                        region={{
-                            latitude: contact.location.latitude,
-                            longitude: contact.location.longitude,
-                            latitudeDelta: 0.0922,
-                            longitudeDelta: 0.0421,
-                        }}>
-                        <Marker coordinate={contact.location} />
-                    </MapView>
-                )}
+                <MapView
+                    style={styles.map}
+                    region={{
+                        latitude,
+                        longitude,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                    }}>
+                    <Marker coordinate={{latitude, longitude}} />
+                </MapView>
 
-                {/* Weather Information */}
+                <Text style={[styles.locationText, {color: colors.text}]}>
+                    {i18n.t('selectedLocation')}: Lat: {latitude.toFixed(4)}, Long:{' '}
+                    {longitude.toFixed(4)}
+                </Text>
+
                 {isWeatherLoading ? (
-                    <Text style={[styles.text, {color: colors.text}]}>
-                        {i18n.t('loadingWeather')}
-                    </Text>
+                    <View style={styles.weatherContainer}>
+                        <Text style={[styles.weatherText, {color: colors.text}]}>
+                            {i18n.t('loadingWeather')}
+                        </Text>
+                    </View>
+                ) : weatherError ? (
+                    <View style={styles.weatherContainer}>
+                        <Text style={[styles.weatherText, {color: colors.text}]}>
+                            {i18n.t('weatherError')}
+                        </Text>
+                    </View>
                 ) : weather ? (
-                    <View style={styles.weatherInfo}>
-                        <Text style={[styles.text, {color: colors.text}]}>
-                            {i18n.t('weather')}:
-                        </Text>
-                        <Text style={[styles.text, {color: colors.text}]}>
-                            {weather.weather[0].description}
-                        </Text>
-                        <Text style={[styles.text, {color: colors.text}]}>
-                            {i18n.t('temperature')}: {weather.main.temp}°C
+                    <View style={styles.weatherContainer}>
+                        <FontAwesome
+                            name={getWeatherIcon()}
+                            size={24}
+                            color={colors.text}
+                            style={styles.weatherIcon}
+                        />
+                        <Text style={[styles.weatherText, {color: colors.text}]}>
+                            {weather.weather[0].description}, {weather.main.temp}°C
                         </Text>
                     </View>
                 ) : (
-                    <Text style={[styles.text, {color: colors.text}]}>
-                        {i18n.t('weatherError')}
-                    </Text>
+                    <View style={styles.weatherContainer}>
+                        <Text style={[styles.weatherText, {color: colors.text}]}>
+                            {i18n.t('noWeather')}
+                        </Text>
+                    </View>
                 )}
             </View>
         </ScrollView>
@@ -139,20 +198,41 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 18,
         marginBottom: 10,
+        marginLeft: 10,
     },
     contactInfo: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 10,
+        width: '100%',
     },
     map: {
         width: '100%',
         height: 200,
         marginVertical: 20,
+        borderRadius: 8,
     },
-    weatherInfo: {
-        marginTop: 20,
+    locationText: {
+        fontSize: 16,
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+    weatherContainer: {
+        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+        padding: 15,
+        borderRadius: 8,
+        marginTop: 10,
+        width: '100%',
         alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    weatherText: {
+        fontSize: 16,
+        marginLeft: 10,
+    },
+    weatherIcon: {
+        marginRight: 8,
     },
 });
 

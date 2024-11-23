@@ -121,24 +121,24 @@ const AddContact = () => {
         if (!weather) {
             return 'cloud';
         }
-        const mainWeather = weather.weather[0].main.toLowerCase().trim(); // Added .trim() to remove extra spaces
+        const mainWeather = weather.weather[0].main.toLowerCase().trim();
 
         if (mainWeather === 'clear') {
-            return 'sun'; // Matches clear weather
+            return 'sun';
         }
         if (mainWeather === 'clouds') {
-            return 'cloud'; // Handles cloud cover
+            return 'cloud';
         }
         if (mainWeather === 'rain') {
-            return 'cloud-rain'; // Handles rain
+            return 'cloud-rain';
         }
         if (mainWeather === 'snow') {
-            return 'snowflake'; // Handles snow
+            return 'snowflake';
         }
         if (mainWeather === 'drizzle' || mainWeather === 'mist' || mainWeather === 'haze') {
-            return 'cloud-drizzle'; // Handles drizzle, mist, and haze
+            return 'cloud-drizzle';
         }
-        return 'cloud'; // Default fallback
+        return 'cloud';
     };
 
     return (
@@ -263,9 +263,9 @@ const AddContact = () => {
 
                     <TouchableOpacity
                         onPress={handleSave}
-                        style={[styles.saveButton, {backgroundColor: colors.primary}]}>
+                        style={[styles.saveButton, {backgroundColor: colors.link}]}>
                         <Text style={[styles.buttonText, {color: colors.text}]}>
-                            {t('saveContact')}
+                            {t('save')}
                         </Text>
                     </TouchableOpacity>
                 </View>

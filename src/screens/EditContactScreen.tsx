@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {View, TextInput, StyleSheet, TouchableOpacity, Text, Image, ScrollView} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, TextInput, TouchableOpacity, Text, Image, ScrollView} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Picker} from '@react-native-picker/picker';
@@ -14,6 +14,7 @@ import IContact from '../interfaces/contact.interface';
 import useContacts from '../hooks/useContacts';
 import {RootStackParamList} from './types/NavigationTypes';
 import {notify} from '../components/NotificationManager';
+import {styles} from './styles/EditContact.style';
 
 type EditContactScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditContact'>;
 
@@ -26,12 +27,28 @@ const EditContact: React.FC = () => {
     const {darkMode} = useTheme();
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
 
+    // Valores iniciales
     const [name, setName] = useState(contact.name || '');
     const [phone, setPhone] = useState(contact.phone || '');
     const [email, setEmail] = useState(contact.email || '');
     const [image, setImage] = useState(contact.image || '');
     const [contactType, setContactType] = useState(contact.isEmployee ? 'Employee' : 'Client');
     const [location, setLocation] = useState(contact.location || {latitude: 0, longitude: 0});
+
+    // Establecer valores predeterminados si no hay coordenadas
+    const defaultCoordinates = {
+        latitude: 37.7749, // San Francisco como ejemplo
+        longitude: -122.4194,
+    };
+
+    // Verifica las coordenadas antes de usarlas
+    useEffect(() => {
+        if (!contact.location || !contact.location.latitude || !contact.location.longitude) {
+            setLocation(defaultCoordinates);
+        } else {
+            setLocation(contact.location);
+        }
+    }, [contact]);
 
     const handleImagePick = async () => {
         try {
@@ -152,7 +169,7 @@ const EditContact: React.FC = () => {
                 <View style={styles.mapContainer}>
                     <MapView
                         style={styles.map}
-                        initialRegion={{
+                        region={{
                             latitude: location.latitude,
                             longitude: location.longitude,
                             latitudeDelta: 0.0922,
@@ -172,70 +189,5 @@ const EditContact: React.FC = () => {
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 10,
-    },
-    imageContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 20,
-        position: 'relative',
-    },
-    image: {
-        width: 200,
-        height: 200,
-        borderRadius: 100,
-    },
-    editIconContainer: {
-        position: 'absolute',
-        bottom: 10,
-        right: 90,
-        backgroundColor: '#007BFF',
-        borderRadius: 50,
-        padding: 5,
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 20,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        paddingHorizontal: 10,
-    },
-    icon: {
-        marginRight: 10,
-    },
-    input: {
-        height: 40,
-        flex: 1,
-    },
-    saveButton: {
-        backgroundColor: '#007BFF',
-        padding: 15,
-        borderRadius: 5,
-        alignItems: 'center',
-        flexDirection: 'row',
-        justifyContent: 'center',
-    },
-    saveButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        marginLeft: 10,
-    },
-    mapContainer: {
-        marginVertical: 20,
-        height: 200,
-    },
-    map: {
-        flex: 1,
-    },
-    scrollContainer: {
-        paddingBottom: 20,
-    },
-});
 
 export default EditContact;
