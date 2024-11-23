@@ -8,7 +8,7 @@ import {
     EditContactUrl,
     DeleteContactUrl,
     CreateContactUrl,
-} from '../utils/routhes';
+} from '../utils/routes';
 import authService from '../services/authService'; // Import the authService
 import {Alert} from 'react-native';
 

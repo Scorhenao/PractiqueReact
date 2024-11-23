@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import axios from 'axios';
 import {notify} from '../components/NotificationManager';
-import {BaseUrl, GetContactsUrl} from '../utils/routhes';
+import {BaseUrl, GetContactsUrl} from '../utils/routes';
 import authService from '../services/authService';
 import {handleGetContactsError} from '../utils/errors/GetContactsErrors';
 

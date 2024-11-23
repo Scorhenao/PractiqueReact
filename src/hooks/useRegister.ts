@@ -1,7 +1,7 @@
 import {RegisterResponse} from '../interfaces/contacts/register/RegisterResponse.interface';
 import {useState} from 'react';
 import {notify} from '../components/NotificationManager';
-import {BaseUrl, RegisterUrl} from '../utils/routhes';
+import {BaseUrl, RegisterUrl} from '../utils/routes';
 import axios from 'axios';
 import {RegisterBodyRequest} from '../interfaces/contacts/register/RegisterBodyRequest.interface';
 import {RegisterErrorResponse} from '../interfaces/contacts/register/RegisterErrorResponse.interface';

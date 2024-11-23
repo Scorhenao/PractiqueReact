@@ -1,4 +1,4 @@
-import {BaseUrl, GetUserByIdUrl} from './../utils/routhes';
+import {BaseUrl, GetUserByIdUrl} from '../utils/routes';
 import {jwtDecode} from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';

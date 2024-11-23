@@ -4,7 +4,7 @@ import {LoginResponse} from '../interfaces/contacts/login/LoginResponse.interfac
 import {useState} from 'react';
 import axios from 'axios';
 import {notify} from '../components/NotificationManager';
-import {BaseUrl, LoginUrl} from '../utils/routhes';
+import {BaseUrl, LoginUrl} from '../utils/routes';
 import authService from '../services/authService';
 import {LoginRequestResponse} from '../interfaces/contacts/login/LoginRequestResponse.interface';
 import {handleLoginError} from './../utils/errors/LoginErrors';

@@ -16,11 +16,11 @@ import {RootStackParamList} from './types/NavigationTypes';
 import authService from '../services/authService'; // Import authService
 import axios from 'axios'; // Axios for making API requests
 import {notify} from '../components/NotificationManager';
-import {BaseUrl, LoginUrl} from '../utils/routhes';
+import {BaseUrl, LoginUrl} from '../utils/routes';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {styles} from './styles/LoginContact.styles';
 
-type NavigationProp = StackNavigationProp<RootStackParamList >;
+type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const LoginScreen = () => {
     const {t} = useTranslation();
