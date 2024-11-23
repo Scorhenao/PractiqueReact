@@ -3,7 +3,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import IContact from '../../interfaces/contact.interface';
 export type RootStackParamList = {
     HomeScreen: undefined;
-    AppContainer: undefined;
+    AppContainer: { syncContacts: IContact[] };
     AddContact: undefined;
     EditContact: {contact: IContact};
     ViewContact: {contact: IContact};

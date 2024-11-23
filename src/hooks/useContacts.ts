@@ -128,6 +128,8 @@ const useContacts = () => {
         }
     };
 
+    
+
     // Cargar contactos cuando la pantalla se enfoca
     useEffect(() => {
         if (focused) {

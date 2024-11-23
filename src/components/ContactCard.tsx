@@ -134,7 +134,7 @@ const ContactCard: React.FC<ContactCardProps> = ({contact, darkMode, onDelete}) 
                         </Text>
                         <View style={styles.confirmButtonContainer}>
                             <TouchableOpacity onPress={handleDelete} style={styles.confirmButton}>
-                                <Text style={{color: '#FF0000'}}>{i18n.t('yes')}</Text>
+                                <Text style={[{color: colors.link}]}>{i18n.t('yes')}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => setConfirmDeleteVisible(false)}
