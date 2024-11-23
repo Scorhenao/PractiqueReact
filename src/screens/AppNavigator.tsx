@@ -14,12 +14,17 @@ import {AppContainer} from './AppContainer';
 import authService from '../services/authService';
 import LoadingScreen from './LoadingScreen';
 import HelpScreen from './HelpScreen';
+import {useTheme} from '../context/themeContext';
+import colorsDarkMode from '../theme/colorsDarkMode';
+import colorsLightMode from '../theme/colorsLightMode';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
     const [isOnboardingCompleted, setIsOnboardingCompleted] = useState<boolean>(false);
+    const darkmode = useTheme();
+    const colors = darkmode ? colorsDarkMode : colorsLightMode;
 
     useEffect(() => {
         const checkUserStatus = async () => {
@@ -44,7 +49,12 @@ export default function AppNavigator() {
         <Stack.Navigator
             initialRouteName={
                 isOnboardingCompleted ? (isLoggedIn ? 'HomeScreen' : 'Login') : 'OnboardingScreen'
-            }>
+            }
+            screenOptions={{
+                headerStyle: {backgroundColor: colors.background, elevation: 100},
+                headerTintColor: colors.text,
+                headerTitleAlign: 'center', // Centra el título
+            }}>
             <Stack.Screen
                 options={{headerShown: false}}
                 name="OnboardingScreen"
@@ -52,10 +62,7 @@ export default function AppNavigator() {
             />
             <Stack.Screen name="HelpScreen" component={HelpScreen} options={{headerShown: false}} />
             <Stack.Screen options={{headerShown: false}} name="HomeScreen" component={HomeScreen} />
-            <Stack.Screen
-                name="Register"
-                component={RegisterScreen}
-            />
+            <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen
                 options={{headerShown: false}}
