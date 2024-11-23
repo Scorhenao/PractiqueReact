@@ -60,7 +60,7 @@ export default function AppNavigator() {
                 name="OnboardingScreen"
                 component={OnboardingScreen}
             />
-            <Stack.Screen name="HelpScreen" component={HelpScreen} options={{headerShown: false}} />
+            <Stack.Screen name="HelpScreen" component={HelpScreen}  />
             <Stack.Screen options={{headerShown: false}} name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
@@ -74,6 +74,7 @@ export default function AppNavigator() {
             <Stack.Screen name="ViewContact" component={ViewContact} />
             <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
             <Stack.Screen name="SelectLocation" component={SelectLocation} />
+
         </Stack.Navigator>
     );
 }

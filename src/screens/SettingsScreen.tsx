@@ -28,20 +28,20 @@ const SettingsScreen = () => {
                 phone: contact.phoneNumbers[0]?.number || '',
                 email: contact.emailAddresses[0]?.email || '',
                 image: contact.thumbnailPath || null,
-                contactType: '', // Asigna un valor por defecto si no lo tienes
-                profilePicture: '', // Asigna un valor por defecto si no lo tienes
-                isEmployee: false, // Asigna un valor por defecto
-                latitude: 0, // Asigna un valor por defecto
-                longitude: 0, // Asigna un valor por defecto
-                location: null, // Asigna un valor por defecto
+                contactType: '',
+                profilePicture: '',
+                isEmployee: false,
+                latitude: 0,
+                longitude: 0,
+                location: null,
             }));
 
             // Enviar los contactos al backend
             for (const contact of mappedContacts) {
-                await addContact(contact); // Llamamos a la función addContact para enviar el contacto al backend
+                await addContact(contact);
             }
 
-            setContacts(mappedContacts); // Actualiza el estado con los contactos mapeados
+            setContacts(mappedContacts);
 
             // Navegamos a AppContainer con los contactos sincronizados
             navigation.navigate('AppContainer', {syncContacts: mappedContacts});
@@ -52,7 +52,6 @@ const SettingsScreen = () => {
         }
     };
 
-    // Función para eliminar un contacto
     const handleDeleteContact = (id: number) => {
         setContacts(prevContacts => prevContacts.filter(contact => contact.id !== id));
     };
@@ -66,10 +65,10 @@ const SettingsScreen = () => {
                 contacts.length > 0 &&
                 contacts.map(contact => (
                     <ContactCard
-                        key={contact.id} // Usamos id como clave única
+                        key={contact.id}
                         contact={contact}
                         darkMode={false}
-                        onDelete={() => handleDeleteContact(contact.id)} // Eliminar el contacto
+                        onDelete={() => handleDeleteContact(contact.id)}
                     />
                 ))}
         </View>

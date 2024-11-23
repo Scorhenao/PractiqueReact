@@ -90,7 +90,8 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
                             />
 
                             {/* Help Button */}
-                            <TouchableOpacity style={styles.menuItem}>
+                            <TouchableOpacity style={styles.menuItem}
+                                onPress={() => navigation.navigate('HelpScreen')}>
                                 <FontAwesome name="question-circle" size={20} color={colors.text} />
                                 <Text style={[styles.menuItemText, {color: colors.text}]}>
                                     {i18n.t('help')}
