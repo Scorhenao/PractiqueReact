@@ -53,7 +53,6 @@ export default function AppNavigator() {
             <Stack.Screen name="HelpScreen" component={HelpScreen} options={{headerShown: false}} />
             <Stack.Screen options={{headerShown: false}} name="HomeScreen" component={HomeScreen} />
             <Stack.Screen
-                options={{headerShown: false}}
                 name="Register"
                 component={RegisterScreen}
             />

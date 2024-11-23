@@ -1,4 +1,3 @@
-import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {
     StyleSheet,
@@ -7,6 +6,7 @@ import {
     TouchableOpacity,
     Alert,
     ActivityIndicator,
+    View,
 } from 'react-native';
 import {useTheme} from '../context/themeContext';
 import colorsLightMode from '../theme/colorsLightMode';
@@ -21,6 +21,8 @@ import Animated, {
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from './types/NavigationTypes';
 import {useRegister} from '../hooks/useRegister';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {useNavigation} from '@react-navigation/native';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -32,6 +34,9 @@ const RegisterScreen = () => {
     const [name, setname] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const {register, loading} = useRegister();
 
     // Animation values
@@ -40,7 +45,6 @@ const RegisterScreen = () => {
     const backgroundColor = useSharedValue(colors.background);
 
     React.useEffect(() => {
-        // Trigger animations on mount
         titleOpacity.value = withTiming(1, {duration: 2000, easing: Easing.out(Easing.exp)});
         inputOpacity.value = withTiming(1, {duration: 1000, easing: Easing.out(Easing.exp)});
     }, [inputOpacity, titleOpacity, backgroundColor]);
@@ -55,8 +59,13 @@ const RegisterScreen = () => {
     }));
 
     const handleRegister = async () => {
-        if (!name || !email || !password) {
+        if (!name || !email || !password || !confirmPassword) {
             Alert.alert('Error', t('Please fill all fields'));
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            Alert.alert('Error', t('Passwords do not match'));
             return;
         }
 
@@ -66,11 +75,10 @@ const RegisterScreen = () => {
             password: password,
         };
 
-        // Now pass all four arguments to the register function
         const result = await register(data);
 
         if (result.success) {
-            navigation.navigate('Login'); // Navigate to Login after successful registration
+            navigation.navigate('Login'); // Navigate to login screen
         }
     };
 
@@ -79,6 +87,7 @@ const RegisterScreen = () => {
             <Animated.Text style={[styles.title, animatedTitleStyle, {color: colors.text}]}>
                 {t('Sign-up to CloseToYou')}
             </Animated.Text>
+
             <TextInput
                 style={[styles.input, {color: colors.text, borderColor: colors.text}]}
                 placeholder={t('namePlaceholder')}
@@ -95,15 +104,47 @@ const RegisterScreen = () => {
                 onChangeText={setEmail}
                 textContentType="emailAddress"
             />
-            <TextInput
-                style={[styles.input, {color: colors.text, borderColor: colors.text}]}
-                placeholder={t('passwordPlaceholder')}
-                placeholderTextColor={colors.placeholder}
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-                textContentType="password"
-            />
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={[styles.input, {color: colors.text, borderColor: colors.text}]}
+                    placeholder={t('passwordPlaceholder')}
+                    placeholderTextColor={colors.placeholder}
+                    secureTextEntry={!showPassword}
+                    value={password}
+                    onChangeText={setPassword}
+                    textContentType="password"
+                />
+                <TouchableOpacity
+                    style={styles.eyeIcon}
+                    onPress={() => setShowPassword(!showPassword)}>
+                    <FontAwesome
+                        name={showPassword ? 'eye' : 'eye-slash'}
+                        size={20}
+                        color={colors.placeholder}
+                    />
+                </TouchableOpacity>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={[styles.input, {color: colors.text, borderColor: colors.text}]}
+                    placeholder={t('confirmPasswordPlaceholder')}
+                    placeholderTextColor={colors.placeholder}
+                    secureTextEntry={!showConfirmPassword}
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    textContentType="password"
+                />
+                <TouchableOpacity
+                    style={styles.eyeIcon}
+                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    <FontAwesome
+                        name={showConfirmPassword ? 'eye' : 'eye-slash'}
+                        size={20}
+                        color={colors.placeholder}
+                    />
+                </TouchableOpacity>
+            </View>
+
             <TouchableOpacity
                 style={[styles.button, {backgroundColor: colors.link}]}
                 onPress={handleRegister}
@@ -131,6 +172,10 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         textAlign: 'center',
     },
+    inputContainer: {
+        position: 'relative',
+        width: '100%',
+    },
     input: {
         height: 40,
         width: '100%',
@@ -145,6 +190,11 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    eyeIcon: {
+        position: 'absolute',
+        right: 10,
+        top: 8,
     },
 });
 
