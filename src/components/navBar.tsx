@@ -13,6 +13,7 @@ import {RootStackParamList} from '../screens/types/NavigationTypes';
 import {StackNavigationProp} from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {styles} from '../screens/styles/navBar.styles';
+import useSearchContacts from '../hooks/useSearchContacts';
 
 type NavBarProps = {
     toggleDropdown: () => void;
@@ -27,10 +28,18 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
     const {darkMode, toggleDarkMode} = useTheme();
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
+    const {searchContacts} = useSearchContacts();
 
     const changeLanguage = (lang: string) => {
         setLanguage(lang);
         i18n.changeLanguage(lang === 'US' ? 'en' : 'es');
+    };
+
+    const handleSearch = async (text: string) => {
+        setSearch(text);
+        if (text.length >= 2) {
+            await searchContacts(text, 'name');
+        }
     };
 
     const data = [
@@ -46,7 +55,6 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
         const loadProfileName = async () => {
             try {
                 const name = await AsyncStorage.getItem('username');
-                console.log('Loaded profileName:', name); // Verifica aquí
                 if (name) {
                     setProfileName(name);
                 }
@@ -90,7 +98,8 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
                             />
 
                             {/* Help Button */}
-                            <TouchableOpacity style={styles.menuItem}
+                            <TouchableOpacity
+                                style={styles.menuItem}
                                 onPress={() => navigation.navigate('HelpScreen')}>
                                 <FontAwesome name="question-circle" size={20} color={colors.text} />
                                 <Text style={[styles.menuItemText, {color: colors.text}]}>
@@ -116,7 +125,7 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
                     {showSearch ? (
                         <SearchBar
                             placeholder={i18n.t('searchPlaceholder')}
-                            onChangeText={setSearch}
+                            onChangeText={handleSearch}
                             value={search}
                             containerStyle={[
                                 styles.searchContainer,
@@ -125,6 +134,13 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
                             inputContainerStyle={styles.inputContainer}
                             inputStyle={{color: colors.background}}
                             placeholderTextColor={colors.background}
+                            platform="default"
+                            showCancel
+                            onCancel={() => {
+                                setShowSearch(false);
+                                setSearch('');
+                                searchContacts('', 'name'); // Limpia la búsqueda
+                            }}
                         />
                     ) : (
                         <Text style={[styles.appTitle, {color: colors.text}]}>CloseToYou</Text>
@@ -135,14 +151,24 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
                 <View style={styles.rightIcons}>
                     {/* Search Icon to toggle SearchBar */}
                     <TouchableOpacity
-                        onPress={() => setShowSearch(!showSearch)}
+                        onPress={() => {
+                            const newShowSearch = !showSearch;
+                            setShowSearch(newShowSearch);
+                            if (!newShowSearch) {
+                                setSearch('');
+                                searchContacts('', 'name');
+                            }
+                        }}
                         style={styles.iconButton}>
-                        <FontAwesome name="search" size={24} color={colors.text} />
+                        <FontAwesome
+                            name={showSearch ? 'times' : 'search'}
+                            size={24}
+                            color={colors.text}
+                        />
                     </TouchableOpacity>
                     {/* Profile Icon */}
                     <View style={styles.profileContainer}>
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('ProfileScreen')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
                             <FontAwesome name="user-circle" size={25} color={colors.text} />
                         </TouchableOpacity>
                         <Text style={[styles.profileName, {color: colors.text}]}>
@@ -154,4 +180,5 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
         </TouchableWithoutFeedback>
     );
 };
+
 export default NavBar;

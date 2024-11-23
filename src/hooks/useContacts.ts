@@ -34,7 +34,6 @@ const useContacts = () => {
         };
     };
 
-    // Cargar contactos desde el backend
     const loadContacts = useCallback(async () => {
         try {
             const headers = await getAuthHeaders();
@@ -49,7 +48,6 @@ const useContacts = () => {
         }
     }, []);
 
-    // Obtener un contacto por ID
     const getContactById = async (id: string) => {
         setLoading(true);
         try {
