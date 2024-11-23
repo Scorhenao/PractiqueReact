@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useMemo} from 'react';
 import {
     StyleSheet,
     View,
@@ -6,8 +6,8 @@ import {
     TouchableWithoutFeedback,
     Keyboard,
     Text,
+    SectionList,
 } from 'react-native';
-import Animated, {LinearTransition} from 'react-native-reanimated';
 import ContactCard from '../components/ContactCard';
 import AddFloatingButton from '../components/AddFloatingButton';
 import useContacts from '../hooks/useContacts';
@@ -23,41 +23,14 @@ export const AppContainer: React.FC = () => {
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [page, setPage] = useState(1);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [loadingMessage, setLoadingMessage] = useState<string>('');
     const {darkMode} = useTheme();
     const colors = darkMode ? colorsLightMode : colorsDarkMode;
 
     const onRefresh = () => {
         setRefreshing(true);
-        setPage(1); // Resetea la página al refrescar
-        loadContacts(); // Carga los primeros contactos
+        loadContacts();
         setRefreshing(false);
     };
-
-    const loadMoreContacts = () => {
-        if (loadingMore) {
-            return;
-        }
-        setLoadingMessage('Cargando más contactos...');
-        setLoadingMore(true);
-        setPage(prevPage => {
-            const nextPage = prevPage + 1;
-            loadContacts(); // Carga más contactos de la página siguiente
-            return nextPage;
-        });
-    };
-
-    const handleAnimationFinish = () => {
-        setTimeout(() => {
-            setLoading(false);
-        }, 6000);
-    };
-
-    const renderContactCard = ({item}: {item: IContact}) => (
-        <ContactCard contact={item} darkMode={darkMode} onDelete={deleteContact} />
-    );
 
     const closeDropdown = () => {
         setDropdownVisible(false);
@@ -68,6 +41,24 @@ export const AppContainer: React.FC = () => {
         setDropdownVisible(!dropdownVisible);
     };
 
+    const groupedContacts = useMemo(() => {
+        const groups: {[key: string]: IContact[]} = {};
+        contacts.forEach(contact => {
+            const firstLetter = contact.name.charAt(0).toUpperCase();
+            if (!groups[firstLetter]) {
+                groups[firstLetter] = [];
+            }
+            groups[firstLetter].push(contact);
+        });
+
+        return Object.keys(groups)
+            .sort()
+            .map(letter => ({
+                title: letter,
+                data: groups[letter],
+            }));
+    }, [contacts]);
+
     const containerRef = useRef<View>(null);
 
     return (
@@ -76,35 +67,33 @@ export const AppContainer: React.FC = () => {
                 style={[styles.container, {backgroundColor: colors.background}]}
                 ref={containerRef}>
                 {loading ? (
-                    <LoadingAnimation onFinished={handleAnimationFinish} />
+                    <LoadingAnimation onFinished={() => setLoading(false)} />
                 ) : (
                     <>
                         <NavBar toggleDropdown={toggleDropdown} dropdownVisible={dropdownVisible} />
-                        <Animated.FlatList
-                            data={contacts}
-                            renderItem={renderContactCard}
+                        <SectionList
+                            sections={groupedContacts}
                             keyExtractor={item => item.id.toString()}
+                            renderItem={({item}) => (
+                                <ContactCard
+                                    contact={item}
+                                    darkMode={darkMode}
+                                    onDelete={deleteContact}
+                                />
+                            )}
+                            renderSectionHeader={({section: {title}}) => (
+                                <Text
+                                    style={[
+                                        styles.sectionHeader,
+                                        {backgroundColor: colors.background, color: colors.text},
+                                    ]}>
+                                    {title}
+                                </Text>
+                            )}
                             refreshControl={
                                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                             }
-                            itemLayoutAnimation={LinearTransition}
-                            onEndReached={loadMoreContacts} // Llama a loadMoreContacts cuando llegamos al final
-                            onEndReachedThreshold={0.1} // Carga más datos cuando está cerca del final
-                            ListFooterComponent={
-                                loadingMore ? (
-                                    <>
-                                        <LoadingAnimation onFinished={handleAnimationFinish} />
-                                        <Text
-                                            style={{
-                                                color: colors.text,
-                                                textAlign: 'center',
-                                                marginVertical: 10,
-                                            }}>
-                                            {loadingMessage}
-                                        </Text>
-                                    </>
-                                ) : null
-                            } // Muestra un loading al final con mensaje
+                            stickySectionHeadersEnabled
                         />
                         <AddFloatingButton
                             buttonColor={darkMode ? colorsDarkMode.link : colorsLightMode.link}
@@ -119,5 +108,11 @@ export const AppContainer: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    sectionHeader: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
     },
 });
