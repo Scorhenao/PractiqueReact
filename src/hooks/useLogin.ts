@@ -29,9 +29,8 @@ export const useLogin = () => {
                 },
             );
 
-            const data = response.data; // Get the response data from the API
+            const data = response.data;
 
-            // Check if the accessToken exists and is valid, and if the response status is 200
             if (
                 data.accessToken &&
                 data.accessToken !== '' &&
@@ -39,10 +38,12 @@ export const useLogin = () => {
                 data.accessToken !== undefined &&
                 response.status === 200
             ) {
-                console.log('Token:', data.accessToken);  // Add this line to verify if the token is being returned correctly.
+                console.log('Token:', data.accessToken); // Add this line to verify if the token is being returned correctly.
 
-                // Store the access token using authService if valid
+                console.log('Name:', data.name);
+
                 await authService.setToken(data.accessToken);
+                await authService.setUsername(data.name);
             }
 
             // Notify the user about successful login

@@ -1,7 +1,9 @@
+import {BaseUrl, GetUserByIdUrl} from './../utils/routhes';
+import {jwtDecode} from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const TOKEN_KEY = 'userToken';
-const ONBOARDING_KEY = 'onboardingStatus';
 
 export const authService = {
     setToken: async (token: string): Promise<void> => {
@@ -10,6 +12,15 @@ export const authService = {
         } catch (error) {
             console.error('Error setting token:', error);
             throw new Error('Failed to set token.');
+        }
+    },
+
+    setUsername: async (username: string): Promise<void> => {
+        try {
+            await AsyncStorage.setItem('username', username);
+        } catch (error) {
+            console.error('Error setting username:', error);
+            throw new Error('Failed to set username.');
         }
     },
 
@@ -23,13 +34,64 @@ export const authService = {
         }
     },
 
-    isTokenValid: async (): Promise<boolean> => {
+    getUserIdFromToken: async (): Promise<string | null> => {
+        interface payload {
+            userId: string;
+            email: string;
+            iat: number;
+        }
+        const token = await authService.getToken();
+        if (!token) {
+            return null;
+        }
+
         try {
-            const token = await AsyncStorage.getItem(TOKEN_KEY);
-            return token !== null;
+            const decodedToken: payload = jwtDecode(token); // Desencripta el token
+            const userId = decodedToken.userId;
+            return userId;
         } catch (error) {
-            console.error('Error verifying token:', error);
-            throw new Error('Failed to verify token.');
+            console.error('Error decoding token:', error);
+            return null;
+        }
+    },
+
+    getUserNameById: async (userId: string): Promise<string | null> => {
+        try {
+            const token = await authService.getToken();
+            if (!token) {
+                throw new Error('No token available');
+            }
+
+            // Ajustar la URL
+            const response = await axios.get(`${BaseUrl}${GetUserByIdUrl}/${userId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            return response.data.name;
+        } catch (error: any) {
+            console.error('Error fetching username by ID:', error.message);
+            if (error.response?.status === 404) {
+                console.warn(`User with ID ${userId} not found.`);
+            }
+            return null;
+        }
+    },
+
+    isTokenValid: async (): Promise<boolean> => {
+        const token = await authService.getToken();
+        if (!token) {
+            return false;
+        }
+
+        try {
+            const decodedToken: any = jwtDecode(token);
+            const now = Date.now() / 1000;
+            return decodedToken.exp > now; // Comprueba que el token no ha expirado
+        } catch (error) {
+            console.error('Error decoding token:', error);
+            return false;
         }
     },
 
@@ -42,21 +104,21 @@ export const authService = {
         }
     },
 
-    setOnboardingStatus: async (status: boolean): Promise<void> => {
+    getOnboardingStatus: async (): Promise<boolean> => {
         try {
-            await AsyncStorage.setItem(ONBOARDING_KEY, JSON.stringify(status));
+            const status = await AsyncStorage.getItem('onboardingStatus');
+            return status === 'true'; // Devuelve `false` si el valor no existe o es diferente de "true"
         } catch (error) {
-            console.error('Error setting onboarding status:', error);
+            console.error('Error getting onboarding status:', error);
+            return false; // Manejo de errores seguro
         }
     },
 
-    getOnboardingStatus: async (): Promise<boolean> => {
+    setOnboardingStatus: async (status: boolean): Promise<void> => {
         try {
-            const status = await AsyncStorage.getItem(ONBOARDING_KEY);
-            return status ? JSON.parse(status) : false;
+            await AsyncStorage.setItem('onboardingStatus', status.toString());
         } catch (error) {
-            console.error('Error getting onboarding status:', error);
-            return false; // Default to false if there's an error
+            console.error('Error setting onboarding status:', error);
         }
     },
 };

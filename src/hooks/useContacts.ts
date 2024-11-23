@@ -2,7 +2,13 @@ import {useState, useEffect, useCallback} from 'react';
 import axios from 'axios';
 import IContact from '../interfaces/contact.interface';
 import {useIsFocused} from '@react-navigation/native';
-import {BaseUrl, GetContactsUrl, EditContactUrl, DeleteContactUrl} from '../utils/routhes';
+import {
+    BaseUrl,
+    GetContactsUrl,
+    EditContactUrl,
+    DeleteContactUrl,
+    CreateContactUrl,
+} from '../utils/routhes';
 import authService from '../services/authService'; // Import the authService
 import {Alert} from 'react-native';
 
@@ -13,6 +19,7 @@ const api = axios.create({
 
 const useContacts = () => {
     const [contacts, setContacts] = useState<IContact[]>([]);
+    const [loading, setLoading] = useState(false); // Para manejar el estado de carga
     const focused = useIsFocused();
 
     // Función para obtener el token y configurar el encabezado de autorización
@@ -24,7 +31,7 @@ const useContacts = () => {
         }
         console.log('Retrieved Token:', token);
         return {
-            Authorization: token ? `Bearer ${token}` : 'Bearer none', // 'Bearer none' o cualquier valor adecuado
+            Authorization: token ? `Bearer ${token}` : 'Bearer none',
         };
     };
 
@@ -39,11 +46,25 @@ const useContacts = () => {
             console.error(
                 'Error loading contacts from backend',
                 error.response?.data || error.message,
-            ); // Muestra el error específico
+            );
         }
     }, []);
 
-    // Verificar si un contacto con el mismo nombre y teléfono ya existe
+    // Obtener un contacto por ID
+    const getContactById = async (id: string) => {
+        setLoading(true); // Set loading to true while fetching data
+        try {
+            const headers = await getAuthHeaders(); // Obtener los encabezados con el token
+            const response = await api.get(`${GetContactsUrl}/${id}`, {headers}); // Petición con el ID
+            return response.data; // Retorna los datos del contacto
+        } catch (error: any) {
+            console.error('Error fetching contact by ID', error.response?.data || error.message);
+            return null;
+        } finally {
+            setLoading(false); // Set loading to false after the request finishes
+        }
+    };
+
     const isDuplicateContact = (newContact: IContact) => {
         return contacts.some(
             contact => contact.name === newContact.name && contact.phone === newContact.phone,
@@ -53,7 +74,6 @@ const useContacts = () => {
     // Añadir un nuevo contacto
     const addContact = async (newContact: IContact, imageUri?: string) => {
         try {
-            // Validate duplicate contacts
             if (isDuplicateContact(newContact)) {
                 console.error('Contact with the same name and phone number already exists');
                 return;
@@ -63,13 +83,19 @@ const useContacts = () => {
             formData.append('name', newContact.name);
             formData.append('phone', newContact.phone);
 
-            // Add optional fields to FormData if available
-            if (newContact.email) {formData.append('email', newContact.email);}
-            if (newContact.contactType) {formData.append('contactType', newContact.contactType);}
-            if (newContact.latitude){ formData.append('latitude', newContact.latitude.toString());}
-            if (newContact.longitude) {formData.append('longitude', newContact.longitude.toString());}
+            if (newContact.email) {
+                formData.append('email', newContact.email);
+            }
+            if (newContact.contactType) {
+                formData.append('contactType', newContact.contactType);
+            }
+            if (newContact.latitude) {
+                formData.append('latitude', newContact.latitude.toString());
+            }
+            if (newContact.longitude) {
+                formData.append('longitude', newContact.longitude.toString());
+            }
 
-            // If image URI exists, append the profile picture to FormData
             if (imageUri) {
                 formData.append('file', {
                     uri: imageUri,
@@ -78,22 +104,18 @@ const useContacts = () => {
                 });
             }
 
-            // Get authentication headers
             const headers = await getAuthHeaders();
 
-            // Send the contact data to the backend
-            const response = await api.post('/api/contacts', formData, {
+            const response = await api.post(CreateContactUrl, formData, {
                 headers: {
                     ...headers,
-                    'Content-Type': 'multipart/form-data', // Explicitly set the content type to multipart/form-data
+                    'Content-Type': 'multipart/form-data',
                 },
             });
 
-            // Update the local contacts list
             setContacts(prevContacts => [...prevContacts, response.data]);
         } catch (error: any) {
             console.error('Error adding contact to backend', error.message);
-            console.error('Error details:', error.response?.data || error);
             Alert.alert('Error', 'There was an issue adding the contact.');
         }
     };
@@ -101,7 +123,7 @@ const useContacts = () => {
     // Actualizar contacto
     const updateContact = async (updatedContact: IContact) => {
         try {
-            const headers = await getAuthHeaders(); // Obtener los encabezados con el token
+            const headers = await getAuthHeaders();
             const response = await api.patch(
                 `${EditContactUrl}/${updatedContact.id}`,
                 updatedContact,
@@ -120,15 +142,13 @@ const useContacts = () => {
     // Eliminar contacto
     const deleteContact = async (contactId: number) => {
         try {
-            const headers = await getAuthHeaders(); // Obtener los encabezados con el token
+            const headers = await getAuthHeaders();
             await api.delete(`${DeleteContactUrl}/${contactId}`, {headers});
             setContacts(prevContacts => prevContacts.filter(contact => contact.id !== contactId));
         } catch (error) {
             console.error('Error deleting contact', error);
         }
     };
-
-    
 
     // Cargar contactos cuando la pantalla se enfoca
     useEffect(() => {
@@ -137,7 +157,15 @@ const useContacts = () => {
         }
     }, [focused, loadContacts]);
 
-    return {contacts, addContact, updateContact, deleteContact, loadContacts};
+    return {
+        contacts,
+        loading, // Exponer estado de carga
+        getContactById,
+        addContact,
+        updateContact,
+        deleteContact,
+        loadContacts,
+    };
 };
 
 export default useContacts;

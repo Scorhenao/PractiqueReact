@@ -10,3 +10,6 @@ export const GetContactsUrl = '/api/contacts'; //GET
 export const SearchContactUrl = '/api/contacts/search'; //GET
 export const EditContactUrl = '/api/contacts'; //PATCH
 export const DeleteContactUrl = '/api/contacts'; //DELETE
+
+// Users
+export const GetUserByIdUrl = '/api/users'; //GET id al final de la url

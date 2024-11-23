@@ -8,13 +8,23 @@ import colorsDarkMode from '../theme/colorsDarkMode';
 import {useTheme} from '../context/themeContext';
 import {RootStackParamList} from './types/NavigationTypes';
 import DarkModeToggle from '../components/DarkModeToggle';
+import authService from '../services/authService';
 
 type OnboardingScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const OnboardingScreen = () => {
     const {darkMode, toggleDarkMode} = useTheme();
-    const colors = darkMode ? colorsDarkMode : colorsLightMode;
+    const colors = darkMode ? colorsLightMode : colorsDarkMode;
     const navigation = useNavigation<OnboardingScreenNavigationProp>();
+
+    const completeOnboarding = async () => {
+        try {
+            await authService.setOnboardingStatus(true);
+            navigation.replace('HomeScreen');
+        } catch (error) {
+            console.error('Error completing onboarding:', error);
+        }
+    };
 
     return (
         <View style={{flex: 1, backgroundColor: colors.background}}>
@@ -23,8 +33,8 @@ const OnboardingScreen = () => {
                 <DarkModeToggle onPress={toggleDarkMode} />
             </View>
             <Onboarding
-                onSkip={() => navigation.replace('HomeScreen')}
-                onDone={() => navigation.replace('HomeScreen')}
+                onSkip={completeOnboarding}
+                onDone={completeOnboarding}
                 pages={[
                     {
                         backgroundColor: colors.background,
@@ -40,16 +50,11 @@ const OnboardingScreen = () => {
                     },
                     {
                         backgroundColor: colors.background,
-                        image: (
-                            <Image
-                                // source={require('../assets/imgs/tutorial/step-2-darkmode.png')}
-                                style={styles.image}
-                            />
-                        ),
+                        image: <Image style={styles.image} />,
                         title: 'Dark Mode',
                         subtitle: 'Switch between light and dark modes for comfortable viewing.',
                     },
-                    // Más páginas...
+                    // Puedes añadir más páginas si es necesario...
                 ]}
             />
         </View>

@@ -24,9 +24,13 @@ export default function AppNavigator() {
     useEffect(() => {
         const checkUserStatus = async () => {
             const token = await authService.getToken();
-            setIsLoggedIn(!!token);
             const onboardingStatus = await authService.getOnboardingStatus();
-            setIsOnboardingCompleted(onboardingStatus);
+
+            console.log('Token:', token);
+            console.log('Onboarding completed:', onboardingStatus);
+
+            setIsLoggedIn(!!token); // Si hay token, el usuario está logueado
+            setIsOnboardingCompleted(onboardingStatus); // Recupera el estado del onboarding
         };
 
         checkUserStatus();

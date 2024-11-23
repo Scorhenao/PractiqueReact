@@ -16,6 +16,7 @@ import {RootStackParamList} from './types/NavigationTypes';
 import authService from '../services/authService'; // Import authService
 import axios from 'axios'; // Axios for making API requests
 import {notify} from '../components/NotificationManager';
+import { BaseUrl, LoginUrl } from '../utils/routhes';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -52,37 +53,43 @@ const LoginScreen = () => {
         backgroundColor: backgroundColor.value,
     }));
 
-    // Handle login request
     const handleLogin = async () => {
         try {
-            // Flash effect on submission
-            backgroundColor.value = withTiming(
-                colors.link,
-                {duration: 100},
-                () => (backgroundColor.value = withTiming(colors.background, {duration: 400})),
-            );
-
-            // API request for login
             const response = await axios.post(
-                'https://close-to-you-backend.onrender.com/api/auth/login',
+                `${BaseUrl}${LoginUrl}`,
+                {email, password},
                 {
-                    email,
-                    password,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                 },
             );
 
             if (response.status === 201 && response.data.accessToken) {
-                // Save token on successful login
+                // Guardar el token
                 await authService.setToken(response.data.accessToken);
-                console.log('Token saved:', response.data.accessToken);
 
-                // Navigate to the main screen
+                // Obtener el ID de usuario
+                const userId = await authService.getUserIdFromToken();
+                console.log(`Decoded userId: ${userId}`); // Loguear el ID para depuración
+
+                if (userId) {
+                    const userName = await authService.getUserNameById(userId);
+                    if (userName) {
+                        console.log(`Fetched username: ${userName}`);
+                        await authService.setUsername(userName);
+                    } else {
+                        console.warn('Failed to fetch username for user ID:', userId);
+                    }
+                }
+
+                // Navegar a la pantalla principal
                 navigation.navigate('AppContainer');
             } else {
-                notify('danger', 'error', 'invalid credentials');
+                notify('danger', 'error', 'Invalid credentials');
             }
-        } catch (error) {
-            console.error('Login failed:', error);
+        } catch (error:any) {
+            console.error('Login failed:', error.message);
             notify('warning', 'error', 'Login failed');
         }
     };
