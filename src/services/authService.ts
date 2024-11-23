@@ -107,10 +107,10 @@ export const authService = {
     getOnboardingStatus: async (): Promise<boolean> => {
         try {
             const status = await AsyncStorage.getItem('onboardingStatus');
-            return status === 'true'; // Devuelve `false` si el valor no existe o es diferente de "true"
+            return status === 'true';
         } catch (error) {
             console.error('Error getting onboarding status:', error);
-            return false; // Manejo de errores seguro
+            return false;
         }
     },
 

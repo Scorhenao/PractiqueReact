@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, TouchableWithoutFeedback} from 'react-native';
+import {View, Text, TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {Dropdown} from 'react-native-element-dropdown';
 import {SearchBar} from 'react-native-elements';
@@ -12,6 +12,7 @@ import DarkModeToggle from './DarkModeToggle';
 import {RootStackParamList} from '../screens/types/NavigationTypes';
 import {StackNavigationProp} from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {styles} from '../screens/styles/navBar.styles';
 
 type NavBarProps = {
     toggleDropdown: () => void;
@@ -44,7 +45,8 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
     useEffect(() => {
         const loadProfileName = async () => {
             try {
-                const name = await AsyncStorage.getItem('profileName');
+                const name = await AsyncStorage.getItem('username');
+                console.log('Loaded profileName:', name); // Verifica aquí
                 if (name) {
                     setProfileName(name);
                 }
@@ -142,8 +144,7 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
                             <FontAwesome name="user-circle" size={25} color={colors.text} />
                         </TouchableOpacity>
                         <Text style={[styles.profileName, {color: colors.text}]}>
-                            {profileName || i18n.t('profileName')}{' '}
-                            {/* Mostrar el nombre del perfil desde AsyncStorage */}
+                            {profileName || i18n.t('profileName')}
                         </Text>
                     </View>
                 </View>
@@ -151,76 +152,4 @@ const NavBar: React.FC<NavBarProps> = ({toggleDropdown, dropdownVisible}) => {
         </TouchableWithoutFeedback>
     );
 };
-
-const styles = StyleSheet.create({
-    navbarContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 16,
-        height: 64,
-        width: '100%',
-        zIndex: 1,
-    },
-    relative: {
-        position: 'relative',
-    },
-    menuContainer: {
-        position: 'absolute',
-        width: 150,
-        top: 40,
-        left: 0,
-        padding: 16,
-        borderRadius: 8,
-        zIndex: 1,
-    },
-    menuItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 16,
-    },
-    menuItemText: {
-        marginLeft: 8,
-    },
-    dropdown: {
-        borderRadius: 4,
-        paddingHorizontal: 8,
-        paddingVertical: 8,
-        marginBottom: 15,
-    },
-    dropdownContainerStyle: {},
-    center: {
-        alignItems: 'center',
-    },
-    searchContainer: {
-        display: 'flex',
-        width: 210,
-        height: 50,
-        marginTop: 20,
-        marginBottom: 20,
-        borderRadius: 20,
-        justifyContent: 'center',
-    },
-    inputContainer: {
-        backgroundColor: '#e1e1e1',
-        borderRadius: 20,
-    },
-    appTitle: {
-        fontSize: 20,
-    },
-    rightIcons: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    iconButton: {
-        marginRight: 16,
-    },
-    profileContainer: {
-        alignItems: 'center',
-    },
-    profileName: {
-        textAlign: 'center',
-    },
-});
-
 export default NavBar;
